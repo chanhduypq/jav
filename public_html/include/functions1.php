@@ -37,6 +37,14 @@ class javfindscraper{
 
 		return 0;
 	}
+        
+        function deleteVideo($code_value){
+
+            $code_value=trim($code_value);
+		$sql = "DELETE FROM videos WHERE code_id='0' and code_value like '$code_value'";
+		$this->mysqli->query($sql);
+		
+	}
 
 	// @findVideos
 	function findVideos($code,$number_result,$code_id=0){
@@ -55,8 +63,7 @@ class javfindscraper{
 		$numpage = $this->getPager($html);
 		if($numpage>1){
 			for ($i=2; $i <= $numpage ; $i++) { 
-				//check run
-				if (!file_exists($this->file_check)) break;
+				
 
 				$sub_url = $url.'?page='.$i;
 				$sub_html = $this->curl_execute($sub_url);
@@ -72,11 +79,36 @@ class javfindscraper{
 		}
                 
 
-		if (file_exists($this->file_check)) {
-			unlink($this->file_check);
-		}
+		
 
 		return $result;
+	}
+        
+        function findVideos1($code,$number_result,$code_id=0){
+            $this->increase=0;
+            $this->number_result=$number_result;
+		file_put_contents($this->file_check, '1');
+		$url = 'http://pron.tv/stream/'.trim($code);
+
+		$check = false;
+		$result = array('status'=>0, 'html'=>'');
+		$html = $this->curl_execute($url);
+		if($this->getDetails($html,$code_id,$code)){
+			$check = true;
+		}
+		//get sub page
+		$numpage = $this->getPager($html);
+		if($numpage>1){
+			for ($i=2; $i <= $numpage ; $i++) { 
+
+				$sub_url = $url.'?page='.$i;
+				$sub_html = $this->curl_execute($sub_url);
+				if($this->getDetails($sub_html,$code_id,$code)){
+					$check = true;
+				}
+			}
+		}
+		
 	}
 
 	// @getDetails
@@ -390,12 +422,15 @@ class javfindscraper{
 		$html_base->load($html);
 
 		$pagers = $html_base->find(".pagination li");
-		foreach ($pagers as $pager) {
-			if(strrpos($pager->class, 'plast')!==false){
-				$numpage = (int) trim($pager->plaintext);
-				break;
-			}
-		}
+                if(is_array($pagers)&&count($pagers)>0){
+                    $numpage=count($pagers);
+                }
+//		foreach ($pagers as $pager) {
+//			if(strrpos($pager->class, 'plast')!==false){
+//				$numpage = (int) trim($pager->plaintext);
+//				break;
+//			}
+//		}
 
 		// clear html_base
 		$html_base->clear();
@@ -412,7 +447,7 @@ class javfindscraper{
 		$num=0;
 		while ($row = $result->fetch_assoc()) {
 			$num++;
-			$html .= '<tr>';
+			$html .= '<tr id="'.$row['id'].'">';
 			$html .= '<td>'.$num.'</td>';
 			$html .= '<td>'.$row['title'].'</td>';
 			$html .= '<td><a href="'.$row['source'].'" target="_blank">'.$row['host'].'</a></td>';
@@ -456,7 +491,7 @@ class javfindscraper{
 		$num=0;
 		while ($row = $result->fetch_assoc()) {
 			$num++;
-			$html .= '<tr>';
+			$html .= '<tr id="'.$row['id'].'">';
 			$html .= '<td>'.$num.'</td>';
 			$html .= '<td>'.$row['title'].'</td>';
 			$html .= '<td><a href="'.$row['source'].'" target="_blank">'.$row['host'].'</a></td>';
@@ -570,19 +605,12 @@ class javfindscraper{
         
         function startCronTrackcode($number_result){
 
-		$check = false;
-		$result = array('status'=>0, 'html'=>'');
 		//loop all dvd code
 		$codes = $this->getAllTrackCode();
 		foreach ($codes as $code) {
-			if($this->findVideos($code['value'],$number_result, $code['id'])){
-				$check = true;
-			}
+			$this->findVideos1($code['value'],$number_result, $code['id']);
 		}
-		//check
-		if($check == true){
-			$result = array('status'=>1, 'html'=>$this->renCodeHtml());
-		}
+		$result = array('status'=>1, 'html'=>$this->renCodeHtml());
 
 		return $result;
 	}

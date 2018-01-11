@@ -1,3 +1,32 @@
+function getCurrentVideos() {
+    var alert = $("#alert");
+    $.ajax({
+        type: 'post',
+        url: '/ajax/ajax.php',
+        data: {action: 'getcurrentvideos', dvdcode: $("#dvd_code").val().trim(), number_result: $('#number_result').val()},
+        async: false,
+        success: function (result) {
+
+            console.log(result);
+            console.log('result');
+            var data = JSON.parse(result);
+            if (data.status == '0') {
+                $(alert).html('<p class="alert alert-danger">Not Found</p>');
+            } else if (data.status == '2') {
+                $(alert).html('<p class="alert alert-warning">The videos is exits in database.</p>');
+            } else if (data.status == '1') {
+                $(alert).html('<p class="alert alert-info">Found the Videos</p>');
+                $("#home_page #sitem-table tbody").html(data.html);
+                $("#csv_export button").removeAttr('disabled').css('cursor', 'pointer');
+            } else {
+                $(alert).html('<p class="alert alert-danger">Error</p>');
+            }
+
+            $(alert).css('visibility', 'visible');
+            $("#datacount").html($("#home_page #sitem-table tbody tr").length)
+        }
+    });
+}
 $(function () {
 
 	//delete callback
@@ -10,7 +39,6 @@ $(function () {
 
 	//function
 	search_videos();
-	stops_search_videos();
 	delete_video_notrack();
 	delete_dvd_code();
 	add_dvd_code();
@@ -52,7 +80,9 @@ $(function () {
 	function search_videos(){
 
 		$('form#search_form').on('submit', function (e) {
+                    stopClicked=false;
                     $('#btn-start').attr('disabled','disabled').css('cursor','not-allowed');
+                    $("#csv_export button").attr('disabled','disabled').css('cursor','not-allowed');
                     $("#datacount").html('0');
                     $("#home_page #sitem-table tbody").html('');
 			//reset alert
@@ -81,6 +111,9 @@ $(function () {
 						$('#home_page #loaddingbar').hide();
 					},
 					success: function (result) {
+                                            if(stopClicked){
+                                                return;
+                                            }
                                             $('#btn-start').removeAttr('disabled').css('cursor','pointer');
                                                 console.log(result);
                                                 console.log('result');
@@ -109,22 +142,10 @@ $(function () {
 
 		});//end submit
 	}
+        
+        
 
 	
-	//stops_search_videos
-	function stops_search_videos(){
-		$('#home_page #stop').on('click', function (e) {
-			$.ajax({
-				type: 'post',
-				url: '/ajax/ajax.php',
-				data: {action: 'stopsearchvideos'},
-				success: function (result) {
-					updatevideosresults($("#dvd_code").val().trim());
-				}
-			});
-			return false;
-		});
-	}
 
 	//delete all videos no track
 	function delete_video_notrack(){

@@ -14,7 +14,7 @@ $html_domain = $smap->renCodeHtmlForDomain();
 		<meta charset="utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title>Jav Tool | Tracker</title>
+		<title>Jav Tool | Statistic</title>
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" >
 		<link rel="stylesheet"  href="css/styles.css" >
 		<!--[if lt IE 9]>
@@ -31,11 +31,11 @@ $html_domain = $smap->renCodeHtmlForDomain();
 				  <a class="navbar-brand" href="index.php">Jav Tool</a>
 				</div>
 				<ul class="nav navbar-nav">
-				  <li><a href="index.php">Home</a></li>
+				  <li><a href="index.php">Database Search</a></li>
 				  <li><a href="track.php">Jav Track</a></li>
                                   <li class="active"><a href="statistic.php">Statistic</a></li>
                                   <li><a href="ultrasound.php">Copyright !</a></li>
-                                  <li><a href="sites">Tab</a></li>
+                                  <li><a href="sites">Instant Search</a></li>
 				</ul>
 			  </div>
 			</nav>
@@ -77,6 +77,7 @@ $html_domain = $smap->renCodeHtmlForDomain();
 								<tr>
 									<th style="width: 20px;">No</th>
 									<th>Domain</th>
+                                                                        <th>Host</th>
                                                                         <th>Count</th>
 								</tr>
 							</thead>
@@ -157,6 +158,6 @@ $html_domain = $smap->renCodeHtmlForDomain();
 		<!-- end DVD code Modal -->
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" ></script>
-		<script src="js/run.js"></script>
+		<script src="js/run.js?<?php echo substr(md5(mt_rand()), 0, 7);?>"></script>
 	</body>
 </html>

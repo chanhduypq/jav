@@ -33,6 +33,16 @@ class javfind{
 	}
 
 
+        function getCurrentVideos($code,$number_result){
+            $html=$this->renVideosHtml($code,$number_result);
+            if(trim($html)!=''){
+                $status=1;
+            }
+            else{
+                $status=0;
+            }
+            return array('status'=>$status, 'html'=>$html);
+        }
 
 	// @findVideos
 	function findVideos($code,$number_result,$code_id=0){
@@ -46,7 +56,7 @@ class javfind{
                     $count="&count=$number_result";
                 }
                 else{
-                    $count='';
+                    $count="&count=100";
                 }
 		
 
@@ -100,6 +110,54 @@ class javfind{
 //		}
 
 		return $result;
+	}
+        
+        // @findVideos
+	function findVideos1($code,$number_result,$code_id=0){
+            $this->increase=0;
+            $this->number_result=$number_result;
+
+		$check = false;
+		$page_limit = 10;
+                if(is_numeric($number_result)){
+                    $count="&count=$number_result";
+                }
+                else{
+                    $count="&count=100";
+                }
+		
+
+		$url = 'http://pron.tv/api/search/stream/?apikey='.$this->apikey.'&query='.trim($code)."$count&from=0";
+		$json_string = $this->curl_execute($url);
+		$datas = json_decode($json_string,true);
+                
+		if(isset($datas['status']) && isset($datas['resultcount']) && isset($datas['result']) && $datas['status']=='success' && $datas['resultcount']>0 && is_array($datas['result']) ){
+			//getDetails
+                    
+			if($this->getDetails($datas['result'],$code_id,$code)){
+				$check = true;
+			}
+
+			// get sub page
+			$numpage = (int) ceil($datas['resultcount']/10);
+			if($numpage>1){
+				for ($i=2; $i <= $numpage ; $i++) { 
+					
+					$sub_url = str_replace('&from=0', '&from='.(($page_limit*($i-1))-1), $url);
+					$sub_json_string = $this->curl_execute($sub_url);
+					$sub_datas = json_decode($sub_json_string,true);
+					if(isset($sub_datas['status']) && isset($sub_datas['resultcount']) && isset($sub_datas['result']) && $sub_datas['status']=='success' && $sub_datas['resultcount']>0 && is_array($sub_datas['result']) ){
+						//getDetails
+						if($this->getDetails($sub_datas['result'],$code_id,$code)){
+							$check = true;
+						}
+					}
+					break;//debug
+				}
+			}
+		}
+                
+		
 	}
 
 	function foomatVideoSize($size){
@@ -173,7 +231,7 @@ class javfind{
 
 	
 	// @exportTocsv
-	function exportTocsv($dvd_code,$limit){
+	function exportTocsv_bk($dvd_code,$limit){
             if(ctype_digit($limit)){
                 $limit='limit '.$limit;
             }
@@ -183,6 +241,29 @@ class javfind{
 		$results = array();
 		$results[]= array('Title','Link','Host','Source','Domain','Language','Size','Quality','Date');
 		$sql = "SELECT * FROM videos where code_id='0' and code_value like '$dvd_code' ORDER BY createdAt DESC $limit";
+		$result = $this->mysqli->query($sql);
+		while ($row = $result->fetch_assoc()) {
+			$results[]= array(
+					$row['title'],
+					$row['link'],
+					$row['host'],
+					$row['source'],
+					$row['domain'],
+					$row['language'],
+					$row['size'],
+					$row['quality'],
+					$row['date']);
+		}
+		return $results;
+	}
+        
+        function exportTocsv($ids){
+            if(!is_array($ids)||count($ids)==0){
+                $ids[]='-1';
+            }
+		$results = array();
+		$results[]= array('Title','Link','Host','Source','Domain','Language','Size','Quality','Date');
+		$sql = "SELECT * FROM videos where id IN (". implode(',', $ids).")";
 		$result = $this->mysqli->query($sql);
 		while ($row = $result->fetch_assoc()) {
 			$results[]= array(
@@ -248,7 +329,7 @@ class javfind{
 		$num=0;
 		while ($row = $result->fetch_assoc()) {
 			$num++;
-			$html .= '<tr>';
+			$html .= '<tr id="'.$row['id'].'">';
 			$html .= '<td>'.$num.'</td>';
 			$html .= '<td>'.$row['title'].'</td>';
 			$html .= '<td><a href="'.$row['source'].'" target="_blank">'.$row['host'].'</a></td>';
@@ -271,7 +352,7 @@ class javfind{
 		$num=0;
 		while ($row = $result->fetch_assoc()) {
 			$num++;
-			$html .= '<tr>';
+			$html .= '<tr id="'.$row['id'].'">';
 			$html .= '<td>'.$num.'</td>';
 			$html .= '<td>'.$row['title'].'</td>';
 			$html .= '<td><a href="'.$row['source'].'" target="_blank">'.$row['host'].'</a></td>';
@@ -362,20 +443,13 @@ class javfind{
         
         function startCronTrackcode($number_result){
 
-		$check = false;
-		$result = array('status'=>0, 'html'=>'');
 		//loop all dvd code
 		$codes = $this->getAllTrackCode();
 		foreach ($codes as $code) {
-			if($this->findVideos($code['value'],$number_result, $code['id'])){
-				$check = true;
-			}
+			$this->findVideos1($code['value'],$number_result, $code['id']);
 		}
 		
-		//check
-		if($check == true){
-			$result = array('status'=>1, 'html'=>$this->renCodeHtml());
-		}
+		$result = array('status'=>1, 'html'=>$this->renCodeHtml());
 
 		return $result;
 	}
@@ -561,6 +635,14 @@ class javfind{
         
         function renCodeHtmlForDomain(){
 
+                $domains=array();
+            
+                $sql = "SELECT * FROM videos";
+		$result = $this->mysqli->query($sql);
+                while ($row = $result->fetch_assoc()) {
+                    $domains[$row['domain']][$row['host']]='1';
+		}
+                
 		$html = '';
 		$sql = "SELECT domain,COUNT(*) AS count FROM videos GROUP BY domain ";
 		$result = $this->mysqli->query($sql);
@@ -571,6 +653,13 @@ class javfind{
 			$html .= '<tr>';
 			$html .= '<td>'.$num.'</td>';
 			$html .= '<td>'.$row['domain'].'</td>';
+                        if(isset($domains[$row['domain']])){
+                            $html .= '<td>' . implode(", ", array_keys($domains[$row['domain']])) . '</td>';
+                        }
+                        else{
+                            $html .= '<td></td>';
+                        }
+                        
                         $html .= '<td>'.$row['count'].'</td>';
 			$html .= '</tr>';
 		}
@@ -599,6 +688,14 @@ class javfind{
                 $sql = "DELETE FROM videos WHERE code_id = '{$id}' ";
 		$this->mysqli->query($sql);
 		return array('status'=>1, 'html'=>$this->renCodeHtml());
+		
+	}
+        
+        function deleteVideo($code_value){
+
+            $code_value=trim($code_value);
+		$sql = "DELETE FROM videos WHERE code_id='0' and code_value like '$code_value'";
+		$this->mysqli->query($sql);
 		
 	}
 

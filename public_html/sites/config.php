@@ -3,11 +3,12 @@
 $dbhost = 'localhost';
 $dbname = 'admin_prontv';
 $dbuser = 'root';
+//$dbpasswd = 'JZ5hNjM$@7zh';
 $dbpasswd = '';
 $mysqli = new mysqli($dbhost, $dbuser, $dbpasswd, $dbname);
 $mysqli->query('SET NAMES utf8mb4;');
 
-function curl_get_content($url,$ssl=false,$count=1,$via_proxy=true) {
+function curl_get_content($url, $ssl = false, $count = 1, $via_proxy = true) {
     $headers = array();
     $headers[] = "Accept-Encoding: gzip, deflate";
     $headers[] = "Accept-Language: en-US,en;q=0.9";
@@ -19,7 +20,7 @@ function curl_get_content($url,$ssl=false,$count=1,$via_proxy=true) {
 
     $ch = curl_init();
 
-    if($via_proxy) {
+    if ($via_proxy) {
         $f_contents = file("proxies.txt");
         $line = trim($f_contents[rand(0, count($f_contents) - 1)]);
         curl_setopt($ch, CURLOPT_PROXY, 'http://' . $line);
@@ -35,9 +36,9 @@ function curl_get_content($url,$ssl=false,$count=1,$via_proxy=true) {
     curl_setopt($ch, CURLOPT_ENCODING, 'gzip, deflate');
     $content = curl_exec($ch);
     $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close ($ch);
+    curl_close($ch);
 
-    if($status != 200 && $via_proxy) {
+    if ($status != 200 && $via_proxy) {
         if ($count < 5) {
             $count++;
             return curl_get_content($url, $ssl, $count, $via_proxy);
@@ -46,15 +47,17 @@ function curl_get_content($url,$ssl=false,$count=1,$via_proxy=true) {
     return $content;
 }
 
-function get_video($dvdcode = 'rctd-034',$url, $search_parameter,$search_result_parameter,$product_parameter,$video_parameter) {
+function get_video($dvdcode = 'rctd-034', $url, $search_parameter, $search_result_parameter, $product_parameter, $video_parameter) {
     $check_ok = false;
-	
-    if(strpos($url,'javdoe.com') !== false ) {
+
+    if (strpos($url, 'javdoe.com') !== false) {
         $dvdcode = strtolower($dvdcode);
     }
-    $search_url = $url.str_replace('[dvdcode]',$dvdcode,$search_parameter);
+    $search_url = $url . str_replace('[dvdcode]', $dvdcode, $search_parameter);
 
     $search_html = curl_get_content($search_url);
+
+
     $search_html_base = new simple_html_dom();
     $search_html_base->load($search_html);
 
@@ -63,63 +66,68 @@ function get_video($dvdcode = 'rctd-034',$url, $search_parameter,$search_result_
     $search_html_base->clear();
     unset($search_html_base);
 
-    if(count($search_items) > 0) {
-        $first_result = $search_items[0];
-        $first_result_href = trim($first_result->href);
-        $first_result_href_parser = explode('!',$first_result_href);
-        $first_result_href = $first_result_href_parser[0];
+    $results = array();
+    if (count($search_items) > 0) {
+        for ($i = 0; $i < count($search_items)&&$i<1; $i++) {
+            $first_result = $search_items[$i];
+            $first_result_href = trim($first_result->href);
+            $first_result_href_parser = explode('!', $first_result_href);
+            $first_result_href = $first_result_href_parser[0];
 
-        $detail_url = $url.''.$first_result_href;
-        if(strpos($first_result_href,$url) === 0) {
-            $detail_url = $url;
-        }
-
-        $detail_html = curl_get_content($detail_url);
-        $detail_html_base = new simple_html_dom();
-        $detail_html_base->load($detail_html);
-
-	$item_title = $detail_html_base->find($product_parameter,0);
-        if(!empty($item_title)) {
-            $check_ok = true;
-            $item_title = trim($item_title->plaintext);
-        } else {
-            $item_title = 'title not found';
-        }
-        
-        if(strpos($url,'javdoe.com') !== false ) {
-            $embed_video = $detail_html_base->find('textarea.select-all',0);
-            if(!empty($embed_video)) {
-                $check_ok = true;
-                $embed_video_text = trim($embed_video->innertext);
-                $tmp_parser = explode('src="', $embed_video_text);
-                $embed_video_text = $tmp_parser[1];
-                $tmp_parser = explode('"',$embed_video_text);
-                $embed_video = $tmp_parser[0];
-            } else {
-                $embed_video = 'embed not found';
+            $detail_url = $url . '' . $first_result_href;
+            if (strpos($first_result_href, $url) === 0) {
+                $detail_url = $url;
             }
-        } else {
-            $embed_video = $detail_html_base->find($video_parameter,0);
-            if(!empty($embed_video)) {
-                $check_ok = true;
-                $embed_video = trim($embed_video->src);
-            } else {
-                $embed_video = 'embed not found';
-            }
-        }
-        if(substr($embed_video,0,1) == '/' && substr($embed_video,1,1) != '/') {
-            $embed_video = $url.''.$embed_video;
-        }
 
-        $detail_html_base->clear();
-        unset($detail_html_base);
+            $detail_html = curl_get_content($detail_url);
+            $detail_html_base = new simple_html_dom();
+            $detail_html_base->load($detail_html);
+
+            $item_title = $detail_html_base->find($product_parameter, 0);
+            if (!empty($item_title)) {
+                $check_ok = true;
+                $item_title = trim($item_title->plaintext);
+            } else {
+                $item_title = 'title not found';
+            }
+
+            if (strpos($url, 'javdoe.com') !== false) {
+                $embed_video = $detail_html_base->find('textarea.select-all', 0);
+                if (!empty($embed_video)) {
+                    $check_ok = true;
+                    $embed_video_text = trim($embed_video->innertext);
+                    $tmp_parser = explode('src="', $embed_video_text);
+                    $embed_video_text = $tmp_parser[1];
+                    $tmp_parser = explode('"', $embed_video_text);
+                    $embed_video = $tmp_parser[0];
+                } else {
+                    $embed_video = 'embed not found';
+                }
+            } else {
+                $embed_video = $detail_html_base->find($video_parameter, 0);
+                if (!empty($embed_video)) {
+                    $check_ok = true;
+                    $embed_video = trim($embed_video->src);
+                } else {
+                    $embed_video = 'embed not found';
+                }
+            }
+            if (substr($embed_video, 0, 1) == '/' && substr($embed_video, 1, 1) != '/') {
+                $embed_video = $url . '' . $embed_video;
+            }
+
+            $detail_html_base->clear();
+            unset($detail_html_base);
+            
+            $results[] = array(
+                'url' => $detail_url,
+                'title' => $item_title,
+                'embed' => $embed_video
+            );
+        }
     }
-    if(!$check_ok) {
+    if (!$check_ok) {
         return false;
     }
-    return array(
-        'url' => $detail_url,
-        'title' => $item_title,
-        'embed' => $embed_video
-    );
+    return $results;
 }

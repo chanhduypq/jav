@@ -12,7 +12,7 @@ if(isset($_POST['csv_export']) && $_POST['csv_export']=='ok'){
 	$delimiter = ",";
 	$filename = "data_" . date('Y-m-d') . ".csv";
 	$f = fopen('php://memory', 'w');
-	$datas = $smap->exportTocsv(trim($_POST['dvd_code']),$_POST['limit']);
+	$datas = $smap->exportTocsv(json_decode($_POST['ids'],true));
 	foreach ($datas as $data) {
 		fputcsv($f, $data, $delimiter);
 	}
@@ -49,11 +49,11 @@ if(isset($_POST['csv_export']) && $_POST['csv_export']=='ok'){
 				  <a class="navbar-brand" href="index.php">Jav Tool</a>
 				</div>
 				<ul class="nav navbar-nav">
-				  <li class="active"><a href="index.php">Home</a></li>
+				  <li class="active"><a href="index.php">Database Search</a></li>
 				  <li><a href="track.php">Jav Track</a></li>
                                   <li><a href="statistic.php">Statistic</a></li>
                                   <li><a href="ultrasound.php">Copyright !</a></li>
-                                  <li><a href="sites">Tab</a></li>
+                                  <li><a href="sites">Instant Search</a></li>
 				</ul>
 			  </div>
 			</nav>
@@ -120,6 +120,7 @@ if(isset($_POST['csv_export']) && $_POST['csv_export']=='ok'){
 								<input type="hidden" name="csv_export" id="csv_export1" value="ok">
                                                                 <input type="hidden" name="dvd_code" id="dvdcode" value="">
                                                                 <input type="hidden" name="limit" id="limit" value="10">
+                                                                <input type="hidden" name="ids" id="ids" value="">
                                                                 <button style="cursor: not-allowed;" disabled="disabled" type="submit" class="btn btn-info btn-block"><span class="glyphicon glyphicon-cloud-download"></span> Export Data</button>
 							</form>
 						</div>
@@ -133,9 +134,9 @@ if(isset($_POST['csv_export']) && $_POST['csv_export']=='ok'){
 						</div>
 					</div>
 					<div class="row" id="loaddingbar" style="display: none;">
-<!--						<div class="col-md-4" style="margin-bottom: 15px;">
+						<div class="col-md-4" style="margin-bottom: 15px;">
 							<button type="button" id="stop" class="btn btn-warning btn-block"><span class="glyphicon glyphicon-stop"></span> Stop</button>
-						</div>-->
+						</div>
 						<div class="col-md-8">
 							<div id="progressbar" class="progress-label">Loading...</div>
 						</div>
@@ -199,14 +200,33 @@ if(isset($_POST['csv_export']) && $_POST['csv_export']=='ok'){
 		<!-- end Erase all data -->
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" ></script>
-		<script src="js/run.js"></script>
+		<script src="js/run.js?<?php echo substr(md5(mt_rand()), 0, 7);?>"></script>
                 <script>
+                    stopClicked=false;
                     jQuery(function ($){
                        $("#number_result").change(function (){
                           $("#limit").val($(this).val()); 
                        }); 
                        $('#dvd_code').on('input', function(){ 
                            $("#dvdcode").val($(this).val());
+                       });
+                       
+                       $("#stop").click(function (){
+                           var alert = $("#alert");
+                           stopClicked=true;
+                          $('#home_page #loaddingbar').hide();
+                          $('#btn-start').removeAttr('disabled').css('cursor','pointer');
+                          $("#csv_export button").attr('disabled','disabled').css('cursor','not-allowed');
+                          getCurrentVideos();                
+                       });
+                       
+                       $("#csv_export").submit(function (){
+                           ids=[];
+                          trs=$("#sitem-table tbody tr");
+                          for(i=0;i<trs.length;i++){
+                              ids.push($(trs[i]).attr('id'));
+                          }
+                          $("#ids").val(JSON.stringify(ids));
                        });
                     });
                 </script>

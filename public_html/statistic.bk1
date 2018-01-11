@@ -31,7 +31,7 @@ $html_domain = $smap->renCodeHtmlForDomain();
 				  <a class="navbar-brand" href="index.php">Jav Tool</a>
 				</div>
 				<ul class="nav navbar-nav">
-				  <li><a href="index.php">Home</a></li>
+				  <li><a href="index.php">Database Search</a></li>
 				  <li><a href="track.php">Jav Track</a></li>
                                   <li class="active"><a href="statistic.php">Statistic</a></li>
 				</ul>

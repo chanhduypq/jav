@@ -50,6 +50,7 @@ if(isset($_POST['action'])){
                 
                 if ($api_scraper == 'api') {
                     $smap = new javfind;
+                    $smap->deleteVideo($url);
                     $status = $smap->findVideos(strtoupper($url),$number_result);
                     if($status['status']=='0'){
                         $status = $smap->findVideos($url,$number_result);
@@ -58,13 +59,20 @@ if(isset($_POST['action'])){
                     exit;
                 } else {
                     $smap = new javfindscraper;
+                    $smap->deleteVideo($url);
                     $status = $smap->findVideos($url,$number_result);
                     echo json_encode($status);
                     exit;
                 }
-		
-		
-		
+	}
+        elseif( $_POST['action']=='getcurrentvideos' && $_POST['dvdcode']!='' ){
+
+		$url = $_POST['dvdcode'];
+                $number_result = $_POST['number_result'];
+                $smap = new javfind;
+                $status = $smap->getCurrentVideos($url,$number_result);
+                echo json_encode($status);
+                exit;
 	}
 	//stop search funtions
 	elseif( $_POST['action']=='stopsearchvideos' ){

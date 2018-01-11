@@ -22,17 +22,33 @@ if (!empty($_POST)) {
         if ($results->num_rows > 0) {
             while ($row = $results->fetch_array()) {
                 $video = get_video($_POST['dvdcode'], $row['url'], $row['search_parameter'], $row['search_result_parameter'], $row['product_parameter'], $row['video_parameter']);
-                $row['real_url'] = '';
-                $row['real_title'] = '';
-                $row['real_host'] = '';
-                $row['status'] = 0;
-                if ($video !== false) {
-                    $row['real_url'] = $video['url'];
-                    $row['real_title'] = $video['title'];
-                    $row['real_host'] = $video['embed'];
-                    $row['status'] = 1;
+                if($video!==FALSE){
+                    foreach ($video as $temp){
+                        $row['real_url'] = $temp['url'];
+                        $row['real_title'] = $temp['title'];
+                        $row['real_host'] = $temp['embed'];
+                        $row['status'] = 1;
+                        $search_data[] = $row;
+                    }
                 }
-                $search_data[] = $row;
+                else{
+                    $row['real_url'] = '';
+                    $row['real_title'] = '';
+                    $row['real_host'] = '';
+                    $row['status'] = 0;
+                    $search_data[] = $row;
+                }
+//                $row['real_url'] = '';
+//                $row['real_title'] = '';
+//                $row['real_host'] = '';
+//                $row['status'] = 0;
+//                if ($video !== false) {
+//                    $row['real_url'] = $video['url'];
+//                    $row['real_title'] = $video['title'];
+//                    $row['real_host'] = $video['embed'];
+//                    $row['status'] = 1;
+//                }
+//                $search_data[] = $row;
             }
         } else {
             $message = 'Error! Site not found.';
@@ -98,7 +114,7 @@ $mysqli->close();
 		<meta charset="utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title>Jav Tool | Tracker</title>
+		<title>Instant Search</title>
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" >
 		<link rel="stylesheet"  href="/css/styles.css" >
 		<!--[if lt IE 9]>
@@ -204,11 +220,11 @@ $mysqli->close();
 				  <a class="navbar-brand" href="index.php">Jav Tool</a>
 				</div>
 				<ul class="nav navbar-nav">
-				  <li><a href="../index.php">Home</a></li>
+				  <li><a href="../index.php">Database Search</a></li>
 				  <li><a href="../track.php">Jav Track</a></li>
                                   <li><a href="../statistic.php">Statistic</a></li>
                                   <li><a href="../ultrasound.php">Copyright !</a></li>
-                                  <li class="active"><a href="/sites">Tab</a></li>
+                                  <li class="active"><a href="/sites">Instant Search</a></li>
 				</ul>
 			  </div>
 			</nav>
@@ -376,7 +392,7 @@ $mysqli->close();
 		<!-- end DVD code Modal -->
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" ></script>
-		<script src="/js/run.js"></script>
+		<script src="/js/run.js?<?php echo substr(md5(mt_rand()), 0, 7);?>"></script>
                 
                 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
                 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>

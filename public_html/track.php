@@ -46,11 +46,11 @@ if(isset($_POST['csv_export']) && $_POST['csv_export']=='ok'){
 				  <a class="navbar-brand" href="index.php">Jav Tool</a>
 				</div>
 				<ul class="nav navbar-nav">
-				  <li><a href="index.php">Home</a></li>
+				  <li><a href="index.php">Database Search</a></li>
 				  <li class="active"><a href="track.php">Jav Track</a></li>
                                   <li><a href="statistic.php">Statistic</a></li>
                                   <li><a href="ultrasound.php">Copyright !</a></li>
-                                  <li><a href="sites">Tab</a></li>
+                                  <li><a href="sites">Instant Search</a></li>
 				</ul>
 			  </div>
 			</nav>
@@ -66,8 +66,8 @@ if(isset($_POST['csv_export']) && $_POST['csv_export']=='ok'){
 
 			<div class="row">
 
-				<div class="col-md-7" style="margin-bottom: 15px;">
-                                    <div class="col-md-8">
+				<div class="col-md-9" style="margin-bottom: 15px;">
+                                    <div class="col-md-10">
 					<button type="button" class="btn btn-info dvd_code" style="margin-right: 10px;"><span class="glyphicon glyphicon-plus"></span> Add a DVD code</button>
                                         
                                         <select id="api_scraper">
@@ -80,10 +80,16 @@ if(isset($_POST['csv_export']) && $_POST['csv_export']=='ok'){
                                             <option value="50">50</option>
                                             <option value="All">All</option>
                                         </select>
-									
+                                        <label style="cursor: pointer;">
+                                            <input type="checkbox" checked id="Database_Search"/>Database Search	
+                                        </label>
+                                        <label style="cursor: pointer;">
+                                            <input type="checkbox" checked id="Instant_Search"/>Instant Search	
+                                        </label>
+                                        			
 					<button type="button" id="cron-start" class="btn btn-success"><span class="glyphicon glyphicon-play"></span> Check now</button>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-2">
                                         <form action="" id="csv_export" method="post">
                                                 <input type="hidden" name="csv_export" id="csv_export1" value="ok">
                                                 <button style="width: 100%;cursor: not-allowed;" disabled="disabled" type="submit" class="btn btn-info btn-block"><span class="glyphicon glyphicon-cloud-download"></span> Export Data</button>
@@ -91,7 +97,7 @@ if(isset($_POST['csv_export']) && $_POST['csv_export']=='ok'){
                                     </div>
 				</div>
 
-				<div class="col-md-5" style="margin-bottom: 15px;">
+				<div class="col-md-3" style="margin-bottom: 15px;">
 					<div class="row" id="loaddingbar" style="display: none;">
 <!--						<div class="col-md-4" style="margin-bottom: 15px;">
 							<button type="button" id="stop" class="btn btn-warning btn-block"><span class="glyphicon glyphicon-stop"></span> Stop</button>
@@ -196,6 +202,6 @@ if(isset($_POST['csv_export']) && $_POST['csv_export']=='ok'){
 		<!-- end DVD code Modal -->
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" ></script>
-		<script src="js/run.js"></script>
+		<script src="js/run.js?<?php echo substr(md5(mt_rand()), 0, 7);?>"></script>
 	</body>
 </html>
