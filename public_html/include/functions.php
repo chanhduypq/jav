@@ -11,6 +11,7 @@ class javfind{
 	/* config db */
 	public $dbhost = 'localhost';
 	public $dbname = 'admin_prontv';
+//        public $dbname = 'admin_prontv_test';
 	public $dbuser = 'root';
 //	public $dbpasswd 	= 'JZ5hNjM$@7zh';
         public $dbpasswd 	= '';

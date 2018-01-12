@@ -13,47 +13,8 @@ require_once 'simple_html_dom.php';
 
 $message = '';
 $page = 'list';
-$is_search = false;
-$search_data = array();
 if (!empty($_POST)) {
-    if (!empty($_POST['dvdcode'])) {
-        $is_search = true;
-        $results = $mysqli->query("SELECT * FROM sites");
-        if ($results->num_rows > 0) {
-            while ($row = $results->fetch_array()) {
-                $video = get_video($_POST['dvdcode'], $row['url'], $row['search_parameter'], $row['search_result_parameter'], $row['product_parameter'], $row['video_parameter']);
-                if($video!==FALSE){
-                    foreach ($video as $temp){
-                        $row['real_url'] = $temp['url'];
-                        $row['real_title'] = $temp['title'];
-                        $row['real_host'] = $temp['embed'];
-                        $row['status'] = 1;
-                        $search_data[] = $row;
-                    }
-                }
-                else{
-                    $row['real_url'] = '';
-                    $row['real_title'] = '';
-                    $row['real_host'] = '';
-                    $row['status'] = 0;
-                    $search_data[] = $row;
-                }
-//                $row['real_url'] = '';
-//                $row['real_title'] = '';
-//                $row['real_host'] = '';
-//                $row['status'] = 0;
-//                if ($video !== false) {
-//                    $row['real_url'] = $video['url'];
-//                    $row['real_title'] = $video['title'];
-//                    $row['real_host'] = $video['embed'];
-//                    $row['status'] = 1;
-//                }
-//                $search_data[] = $row;
-            }
-        } else {
-            $message = 'Error! Site not found.';
-        }
-    } elseif (!empty($_POST['action']) && $_POST['action'] == 'delete') {
+    if (!empty($_POST['action']) && $_POST['action'] == 'delete') {
         $sql = 'DELETE FROM sites WHERE id="' . $_POST['id'] . '"';
         $mysqli->query($sql);
     } else {
@@ -104,9 +65,10 @@ if (!empty($_POST)) {
         }
     }
 }
+
 $results = $mysqli->query("SELECT * FROM sites ORDER BY id desc");
 $num_rows = $results->num_rows;
-$mysqli->close();
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -160,6 +122,29 @@ $mysqli->close();
                     .list, .add_form, .edit_form {
                         display: none;
                     }
+                    #sites, #test_sites,#results {
+                        font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+                        border-collapse: collapse;
+                        width: 100%;
+                    }
+
+                    #sites td, #sites th, #test_sites td, #test_sites th {
+                        border: 1px solid #ddd;
+                        padding: 8px;
+                    }
+
+                    #sites tr:nth-child(even),#test_sites tr:nth-child(even){background-color: #f2f2f2;}
+
+                    #sites tr:hover,#test_sites tr:hover {background-color: #ddd;}
+
+                    #sites th,#test_sites th {
+                        padding-top: 12px;
+                        padding-bottom: 12px;
+                        text-align: left;
+                        background-color: #4CAF50;
+                        color: white;
+                    }
+                    
                     #sites, #test_sites {
                         font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
                         border-collapse: collapse;
@@ -182,6 +167,32 @@ $mysqli->close();
                         background-color: #4CAF50;
                         color: white;
                     }
+                    
+                    /*tuetc*/
+
+                    #results {
+                        font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+                        border-collapse: collapse;
+                        width: 100%;
+                    }
+
+                    #results td, #results th{
+                        border: 1px solid #ddd;
+                        padding: 8px;
+                    }
+
+                    #results tr:nth-child(even){background-color: #f2f2f2;}
+
+                    #results tr:hover{background-color: #ddd;}
+
+                    #results th {
+                        padding-top: 12px;
+                        padding-bottom: 12px;
+                        text-align: left;
+                        background-color: #4CAF50;
+                        color: white;
+                    }
+                    
                     #test_sites {
                         width: calc(100% - 175px);
                         margin-left: 175px;
@@ -249,77 +260,60 @@ $mysqli->close();
                             echo '<div class="message btn" style="background: '.$bg.';">'.$message.'</div>';
                         } ?>
                     <div class="clear10"></div>
-                    <div class="content list">
-                        <form method="post">
-                        <input style="float:left;height:43px;width: 300px;margin-right: 20px" type="text" name="dvdcode" placeholder="dvd code" required><input style="width: auto" type="submit" value="Search">
-                            <?php if($is_search) { ?>
-                                <a href="index.php" class="btn" style="float:right;text-decoration: none">Clear</a>
-                            <?php } ?>
+                    <div class="row">
+                            <div class="col-lg-12 col-md-12">
+                                    <div id="alert" style="visibility: hidden;height: 52px;width: 100%;margin-bottom: 5px;"></div>
+                            </div>
+                    </div>
+                    <div class="content list row">
+                        <form method="post" id="search_form1" onsubmit="return false;">
+                            <div class="col-md-6">
+                                <input style="float:left;height:43px;width: 300px;margin-right: 20px" type="text" name="dvdcode" placeholder="dvd code"><input style="width: auto" type="submit" value="Search">
+                                    
+                                </div>    
                         </form>
-                        <?php if($is_search) { ?>
-                            <?php if (count($search_data) == 0) {
-                                echo '<div class="no_data">No site found.</div>';
-                            } else { ?>
-                                <table id="sites">
+                        <div id="loaddingbar" class="col-md-4" style="visibility: hidden;">
+                                <button type="button" id="stop" class="btn btn-warning btn-block"><span class="glyphicon glyphicon-stop"></span> Stop</button>
+                        </div>
+                        <div class="col-md-2">
+                                <a id="clear" href="index.php" class="btn" style="float:right;text-decoration: none;display: none;">Clear</a>
+                        </div>
+                        <div class="no_data" id="no_data" style="display: none;">No site found.</div>
+                        
+                        
+                        <table id="sites">
+                                <thead>
                                     <tr>
                                         <th>Name</th>
                                         <th>Url</th>
-                                        <th>Site detail url</th>
-                                        <th>Name of product</th>
-                                        <th>Host url</th>
-                                        <th></th>
+                                        <th>Search parameter</th>
+                                        <th>Detail page parameter</th>
+                                        <th>Product title parameter</th>
                                         <th></th>
                                     </tr>
-                                    <?php foreach ($search_data as $row) { ?>
-                                        <tr id="site_<?php echo $row['id']; ?>" data-video_host="<?php echo $row['video_host']; ?>" data-name="<?php echo $row['name']; ?>" data-url="<?php echo $row['url']; ?>"
-                                            data-search_parameter="<?php echo $row['search_parameter']; ?>" data-detail_parameter="<?php echo $row['detail_parameter']; ?>" data-product_parameter="<?php echo $row['product_parameter']; ?>"
-                                            data-real_url="<?php echo $row['real_url']; ?>" data-real_title="<?php echo $row['real_title']; ?>" data-real_host="<?php echo $row['real_host']; ?>"
-                                            data-video_parameter="<?php echo $row['video_parameter']; ?>" data-search_result_parameter="<?php echo $row['search_result_parameter']; ?>">
-                                            <td id="site_1_name" style="word-break: break-word;"><?php echo $row['name']; ?></td>
-                                            <td id="site_1_url" style="word-break: break-word;"><?php echo $row['url']; ?></td>
-                                            <td id="site_1_real_url" style="word-break: break-word;"><?php echo $row['real_url']; ?></td>
-                                            <td id="site_1_real_title" style="word-break: break-word;"><?php echo $row['real_title']; ?></td>
-                                            <td id="site_1_real_host" style="word-break: break-word;"><?php echo $row['real_host']; ?></td>
-                                            <td><?php if($row['status'] == 1) echo '<img style="width:80px" src="checked.png">'; else echo '<img style="width:80px" src="unchecked.png">'; ?></td>
-                                            <td>
-                                                <div style="display: inline-block;" onclick="edit_site(<?php echo $row['id']; ?>)" class="btn">Edit</div>
-                                            </td>
-                                        </tr>
+                                </thead>
+                                <tbody>
+                                    <?php while($row = $results->fetch_array()) { ?>
+                                    <tr id="site_<?php echo $row['id']; ?>" data-video_host="<?php echo $row['video_host']; ?>" data-name="<?php echo $row['name']; ?>" data-url="<?php echo $row['url']; ?>"
+                                        data-search_parameter="<?php echo $row['search_parameter']; ?>" data-detail_parameter="<?php echo $row['detail_parameter']; ?>" data-product_parameter="<?php echo $row['product_parameter']; ?>"
+                                        data-video_parameter="<?php echo $row['video_parameter']; ?>" data-search_result_parameter="<?php echo $row['search_result_parameter']; ?>">
+                                        <td id="site_<?php echo $row['id']; ?>_name" style="word-break: break-word;"><?php echo $row['name']; ?></td>
+                                        <td id="site_<?php echo $row['id']; ?>_url" style="word-break: break-word;"><?php echo $row['url']; ?></td>
+                                        <td id="site_<?php echo $row['id']; ?>_search_parameter" style="word-break: break-word;"><?php echo $row['search_parameter']; ?></td>
+                                        <td id="site_<?php echo $row['id']; ?>_detail_parameter" style="word-break: break-word;"><?php echo $row['detail_parameter']; ?></td>
+                                        <td id="site_<?php echo $row['id']; ?>_product_parameter" style="word-break: break-word;"><?php echo $row['product_parameter']; ?></td>
+                                        <td>
+                                            <div style="display: inline-block;" onclick="edit_site(<?php echo $row['id']; ?>)" class="btn">Edit</div>
+                                        </td>
+                                    </tr>
                                     <?php } ?>
-                                </table>
-                            <?php } ?>
-
-                        <?php } else { ?>
-                            <?php if ($num_rows == 0) {
-                                echo '<div class="no_data">No site found.</div>';
-                            } else { ?>
-                            <table id="sites">
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Url</th>
-                                    <th>Search parameter</th>
-                                    <th>Detail page parameter</th>
-                                    <th>Product title parameter</th>
-                                    <th></th>
-                                </tr>
-                                <?php while($row = $results->fetch_array()) { ?>
-                                <tr id="site_<?php echo $row['id']; ?>" data-video_host="<?php echo $row['video_host']; ?>" data-name="<?php echo $row['name']; ?>" data-url="<?php echo $row['url']; ?>"
-                                    data-search_parameter="<?php echo $row['search_parameter']; ?>" data-detail_parameter="<?php echo $row['detail_parameter']; ?>" data-product_parameter="<?php echo $row['product_parameter']; ?>"
-                                    data-video_parameter="<?php echo $row['video_parameter']; ?>" data-search_result_parameter="<?php echo $row['search_result_parameter']; ?>">
-                                    <td id="site_1_name" style="word-break: break-word;"><?php echo $row['name']; ?></td>
-                                    <td id="site_1_url" style="word-break: break-word;"><?php echo $row['url']; ?></td>
-                                    <td id="site_1_search_parameter" style="word-break: break-word;"><?php echo $row['search_parameter']; ?></td>
-                                    <td id="site_1_detail_parameter" style="word-break: break-word;"><?php echo $row['detail_parameter']; ?></td>
-                                    <td id="site_1_product_parameter" style="word-break: break-word;"><?php echo $row['product_parameter']; ?></td>
-                                    <td>
-                                        <div style="display: inline-block;" onclick="edit_site(<?php echo $row['id']; ?>)" class="btn">Edit</div>
-                                    </td>
-                                </tr>
-                                <?php } ?>
+                                </tbody>
+                                
                             </table>
-                            <?php } ?>
-                        <?php } ?>
+                            
                     </div>
+                    
+                    
 
                     <div class="content add_form edit_form">
                         <form method="post">
@@ -396,15 +390,134 @@ $mysqli->close();
                 
                 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
                 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-                
+               
                 <script type="text/javascript">
+                    stopClicked=false;
+                    addColumn=false;
+                    siteIds=[];
+                    var resultAjax='';
+                    var count_ajax=0;
+                    <?php 
+                    $results1 = $mysqli->query("SELECT * FROM sites ORDER BY id desc");
+                    while($row = $results1->fetch_array()) { ?>
+                        <?php echo 'siteIds.push("'.$row['id'].'");'; ?>
+                    <?php 
+                    } 
+                    $mysqli->close();
+                    ?>
                     $( function() {
+                        $("#stop").click(function (){
+                           stopClicked=true;
+                           for(i=0;i<siteIds.length;i++){
+                                siteId=siteIds[i];
+                                $("tr#site_"+siteId).removeClass('progress-label');
+                            }
+                          $('#loaddingbar').css('visibility', 'hidden');
+                          $('form#search_form1 input[type="submit"]').removeAttr('disabled').css('cursor','pointer');
+                          if(count_ajax>0){
+                              $("#clear").show();
+                          }
+                       });
+                       
                         $( "#tabs" ).tabs();
                         
                         $('.list').show();
                         <?php if($page == 'add_form') { echo 'add_site();'; } ?>
                         $('.message').delay(3000).fadeOut('slow');
+                        
+                        $('form#search_form1 input[type="submit"]').on('click', function (e) {
+                            stopClicked=false;
+                            count_ajax=0;
+                            resultAjax='';
+                            $('form#search_form1 input[type="submit"]').attr('disabled','disabled').css('cursor','not-allowed');
+                            $("#no_data").hide();
+                            $("#clear").hide();
+                            $('#alert').html('');
+                            $('#alert').css('visibility', 'hidden');
+                            $('#loaddingbar').css('visibility', 'visible');
+                                //reset alert
+                                if($('form#search_form1 input[type="text"]').val().trim()==''){
+                                        $('#alert').html('<p class="alert alert-danger">Please put a DVD code</p>');
+                                        $('#alert').css('visibility', 'visible');
+                                        $('form#search_form1 input[type="submit"]').removeAttr('disabled').css('cursor','pointer');
+                                        $('#loaddingbar').css('visibility', 'hidden');
+                                        return;
+                                }
+                                else{
+                                    runAjax();
+                                    
+
+                                }//end else
+
+                        });//end submit
                     });
+                    
+                    function runAjaxForOneSite(siteId){
+                        if(!$("tr#site_"+siteId).hasClass($('form#search_form1 input[type="text"]').val().trim())){
+                            $("tr#site_"+siteId).addClass('progress-label');
+                            $.ajax({
+                                    type: 'post',
+                                    url: '/sites/ajax1.php',
+                                    data: {action: 'findvideos',site_id:siteId, dvdcode : $('form#search_form1 input[type="text"]').val().trim()},
+                                    async: true,
+                                    success: function (result) {
+
+                                        console.log(result);
+                                        count_ajax++;
+                                        if(stopClicked==false){
+                                            $("tr#site_"+siteId).removeClass('progress-label');
+
+                                            $("#sites thead").html('<tr><th>Name</th><th>Url</th><th>Site detail url</th><th>Name of product</th><th>Host url</th><th></th><th></th></tr>');
+                                            if(addColumn==false){
+                                                for(j=0;j<$("#sites tbody tr").length;j++){
+                                                    $("#sites tbody tr").eq(j).find('td:last').before("<td></td>");
+                                                }
+                                                addColumn=true;
+                                            }
+                                            $("tr#site_"+siteId).replaceWith(result);
+
+                                            if(count_ajax==siteIds.length){
+
+                                                $('#loaddingbar').css('visibility', 'hidden');
+                                                $('form#search_form1 input[type="submit"]').removeAttr('disabled').css('cursor','pointer');
+                                                $("#clear").show();
+                                            }
+                                        }
+//                                                    count_ajax++;
+//                                                    resultAjax+=result;
+//                                                        
+//                                                    if(count_ajax==siteIds.length&&stopClicked==false){
+//                                                        for(i=0;i<siteIds.length;i++){
+//                                                            siteId=siteIds[i];
+//                                                            $("tr#site_"+siteId).removeClass('progress-label');
+//                                                        }
+//                                                        $('#loaddingbar').css('visibility', 'hidden');
+//                                                        $('form#search_form1 input[type="submit"]').removeAttr('disabled').css('cursor','pointer');
+//                                                        if($.trim(resultAjax)==''){
+//                                                            $("#no_data").show();
+//                                                        }
+//                                                        else{
+//                                                            $("#sites thead").html('<tr><th>Name</th><th>Url</th><th>Site detail url</th><th>Name of product</th><th>Host url</th><th></th><th></th></tr>');
+//                                                            $("#sites tbody").html(resultAjax);
+//                                                            $("#clear").show();
+//                                                        }
+//                                                    }
+
+
+                                    }
+                            });
+                        }
+                    }
+                    
+                    function runAjax(){
+                        for(i=0;i<siteIds.length;i++){
+                            siteId=siteIds[i];
+                            console.log(siteId);
+                            console.log($("tr#site_"+siteId).hasClass($('form#search_form1 input[type="text"]').val().trim()));
+                            runAjaxForOneSite(siteId)
+
+                        }
+                    }
 
                     function delete_btn() {
                         var confirmi = confirm('Do you want to delete ?');

@@ -7,6 +7,7 @@ class javfindscraper{
 	/* config db */
 	public $dbhost = 'localhost';
 	public $dbname = 'admin_prontv';
+//        public $dbname = 'admin_prontv_test';
 	public $dbuser = 'root';
 //	public $dbpasswd 	= 'JZ5hNjM$@7zh';
         public $dbpasswd 	= '';
@@ -64,7 +65,6 @@ class javfindscraper{
 		if($numpage>1){
 			for ($i=2; $i <= $numpage ; $i++) { 
 				
-
 				$sub_url = $url.'?page='.$i;
 				$sub_html = $this->curl_execute($sub_url);
 				if($this->getDetails($sub_html,$code_id,$code)){
@@ -78,8 +78,6 @@ class javfindscraper{
 			$result = array('status'=>1, 'html'=>$this->renVideosHtml($code, $number_result));
 		}
                 
-
-		
 
 		return $result;
 	}
@@ -417,14 +415,17 @@ class javfindscraper{
 	// @getPager
 	function getPager($html){
 
-		$numpage = 1;
 		$html_base = new simple_html_dom();
 		$html_base->load($html);
 
 		$pagers = $html_base->find(".pagination li");
-                if(is_array($pagers)&&count($pagers)>0){
-                    $numpage=count($pagers);
+                
+                $arr[] = 1;
+                foreach ($pagers as $pager) {
+                    $arr[] = (int) trim($pager->plaintext);
                 }
+                $numpage = max($arr);
+
 //		foreach ($pagers as $pager) {
 //			if(strrpos($pager->class, 'plast')!==false){
 //				$numpage = (int) trim($pager->plaintext);

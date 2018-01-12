@@ -5,7 +5,6 @@ require 'include/functions1.php';
 
 //renToHtml
 $smap = new javfind;
-
 //export to csv
 if(isset($_POST['csv_export']) && $_POST['csv_export']=='ok'){
 

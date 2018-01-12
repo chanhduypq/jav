@@ -2,6 +2,7 @@
 
 $dbhost = 'localhost';
 $dbname = 'admin_prontv';
+//$dbname = 'admin_prontv_test';
 $dbuser = 'root';
 //$dbpasswd = 'JZ5hNjM$@7zh';
 $dbpasswd = '';
@@ -68,7 +69,7 @@ function get_video($dvdcode = 'rctd-034', $url, $search_parameter, $search_resul
 
     $results = array();
     if (count($search_items) > 0) {
-        for ($i = 0; $i < count($search_items)&&$i<1; $i++) {
+        for ($i = 0; $i < count($search_items); $i++) {
             $first_result = $search_items[$i];
             $first_result_href = trim($first_result->href);
             $first_result_href_parser = explode('!', $first_result_href);
@@ -119,11 +120,16 @@ function get_video($dvdcode = 'rctd-034', $url, $search_parameter, $search_resul
             $detail_html_base->clear();
             unset($detail_html_base);
             
-            $results[] = array(
-                'url' => $detail_url,
-                'title' => $item_title,
-                'embed' => $embed_video
-            );
+            if(strpos($item_title, $dvdcode)!==FALSE||strpos($detail_url, $dvdcode)!==FALSE){
+                $results[] = array(
+                    'url' => $detail_url,
+                    'title' => $item_title,
+                    'embed' => $embed_video
+                );
+
+                break;
+            }
+            
         }
     }
     if (!$check_ok) {
