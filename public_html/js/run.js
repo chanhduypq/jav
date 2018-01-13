@@ -371,8 +371,7 @@ $(function () {
 	//show_sites_details
 	function show_sites_details(){
 		//site_detail
-		$('.site_detail').unbind("click").on( "click", function() {
-
+                $( "body" ).delegate( ".site_detail", "click", function() {
 			$.ajax({
 				type: 'post',
 				url: '/ajax/ajax.php',
@@ -398,8 +397,7 @@ $(function () {
 	//show_source_details
 	function show_source_details(){
 		//source_detail
-		$('.source_detail').unbind("click").on( "click", function() {
-
+                $( "body" ).delegate( ".source_detail", "click", function() {
 			$.ajax({
 				type: 'post',
 				url: '/ajax/ajax.php',
