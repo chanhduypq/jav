@@ -1,3 +1,20 @@
+var intervalScrap;
+function updateVideo(){
+    console.log('tuetc');
+    $.ajax({
+        type: 'post',
+        url: '/ajax/ajax.php',
+        data: {action: 'getcurrentvideos', dvdcode : $("#dvd_code").val().trim(),number_result:$('#number_result').val()},
+        async: true,
+        success: function (result) {
+            var data = JSON.parse(result);
+            if(data.status=='1'){
+                    $("#home_page #sitem-table tbody").html(data.html);
+            }
+            $("#datacount").html($("#home_page #sitem-table tbody tr").length);
+        }
+    });
+}
 function getCurrentVideos() {
     var alert = $("#alert");
     $.ajax({
@@ -75,12 +92,15 @@ $(function () {
 	});
 	// --------------------------------END MODAL--------------------------------
 
+    
 	// --------------------------------HOME-------------------------------------
 	//search_videos
 	function search_videos(){
 
 		$('form#search_form').on('submit', function (e) {
                     stopClicked=false;
+                    clearInterval(intervalScrap);
+                    
                     $('#btn-start').attr('disabled','disabled').css('cursor','not-allowed');
                     $("#csv_export button").attr('disabled','disabled').css('cursor','not-allowed');
                     $("#datacount").html('0');
@@ -99,6 +119,7 @@ $(function () {
 			else{
 
 				e.preventDefault();
+                                intervalScrap=setInterval(updateVideo,2000);
 				$.ajax({
 					type: 'post',
 					url: '/ajax/ajax.php',
@@ -111,7 +132,8 @@ $(function () {
 						$('#home_page #loaddingbar').hide();
 					},
 					success: function (result) {
-                                            if(stopClicked){
+                                            clearInterval(intervalScrap);
+                                            if(stopClicked){                                                
                                                 return;
                                             }
                                             $('#btn-start').removeAttr('disabled').css('cursor','pointer');
@@ -138,6 +160,8 @@ $(function () {
                                                 $("#datacount").html($("#home_page #sitem-table tbody tr").length)
 					}
 				});
+                                
+                                
 			}//end else
 
 		});//end submit

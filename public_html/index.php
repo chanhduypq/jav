@@ -211,6 +211,7 @@ if(isset($_POST['csv_export']) && $_POST['csv_export']=='ok'){
                        });
                        
                        $("#stop").click(function (){
+                           clearInterval(intervalScrap);
                            var alert = $("#alert");
                            stopClicked=true;
                           $('#home_page #loaddingbar').hide();
