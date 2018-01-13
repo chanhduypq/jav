@@ -189,6 +189,8 @@ class javfindscraper{
 					//domain
 					$tmp = $node->find(".source");
 					$data['domain'] = (isset($tmp[0]))?trim($tmp[0]->plaintext):'';
+                                        $data['source'] = rtrim($data['source'],'/');
+                                        $data['link'] = rtrim($data['link'],'/');
 
 					//add to databse
 					if($data['title']!='' && $this->checkData($data['link'],$code_id) ){
@@ -251,7 +253,7 @@ class javfindscraper{
 			}
 			elseif(strrpos($tmp, $tmp_link)!==false ){
 				$tmp = str_replace($tmp_link, '', $tmp);
-				$data['link'] = trim(strip_tags($tmp));
+				$data['link'] = rtrim(trim(strip_tags($tmp)),'/');
 			}
 			elseif(strrpos($tmp, $tmp_title)!==false ){
 				$tmp = str_replace($tmp_title, '', $tmp);
@@ -314,6 +316,7 @@ class javfindscraper{
 		// clear html_base
 		$html_base->clear();
 		unset($html_base);
+                $data['source'] = rtrim($data['source'],'/');
 		//merge data
 		if($data['title']!=''){// && $this->checkData($data['link'], $code_id) ){
                     if(!is_numeric($this->number_result)||$this->increase< $this->number_result){

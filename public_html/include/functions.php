@@ -195,7 +195,7 @@ class javfind{
 						'title'=>(isset($video_data['sourcetitle']))?trim($video_data['sourcetitle']):'',
 						'code_id'=>$code_id,
                                                 'code_value'=>$code_value,
-						'link'=>(isset($video_data['sourceurl']))?trim($video_data['sourceurl']):'',
+						'link'=>(isset($video_data['sourceurl']))?rtrim(trim($video_data['sourceurl']),'/'):'',
 						'host'=>(isset($video_data['hostername']))?trim($video_data['hostername']):'',
 						'source'=>'',
 						'domain'=>(isset($video_data['sourcename']))?trim($video_data['sourcename']):'',
@@ -208,7 +208,7 @@ class javfind{
 			if(isset($video_data['hosterurls']) && is_array($video_data['hosterurls'])){
 				foreach ($video_data['hosterurls'] as $hosterurl) {
 					if(isset($hosterurl['url']) ){
-						$data['source'] = trim($hosterurl['url']);
+						$data['source'] = rtrim(trim($hosterurl['url']),'/');
 						break;
 					}
 				}
@@ -498,7 +498,7 @@ class javfind{
 	function showSitesDetails($code_id){
 
 		$html = '';
-		$sql = "SELECT `link` FROM videos WHERE`code_id` = '{$code_id}' AND `link` <> '' ";
+		$sql = "SELECT DISTINCT(`link`) FROM videos WHERE`code_id` = '{$code_id}' AND `link` <> '' ";
 		$result = $this->mysqli->query($sql);
 		$num=0;
 		while ($row = $result->fetch_assoc()) {
@@ -512,7 +512,7 @@ class javfind{
 	function showSourceDetails($code_id){
 
 		$html = '';
-		$sql = "SELECT `source` FROM videos WHERE`code_id` = '{$code_id}' AND `source` <> '' ";
+		$sql = "SELECT DISTINCT(`source`) FROM videos WHERE`code_id` = '{$code_id}' AND `source` <> '' ";
 		$result = $this->mysqli->query($sql);
 		$num=0;
 		while ($row = $result->fetch_assoc()) {
