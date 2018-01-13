@@ -617,6 +617,15 @@ class javfind{
         
         function renCodeHtmlForHost(){
 
+                $host=array();
+                $sql = "SELECT * FROM videos";
+		$result = $this->mysqli->query($sql);
+                while ($row = $result->fetch_assoc()) {
+                    if(strpos($row['link'], $row['host'])!==FALSE){
+                        $host[$row['host']][]='1';
+                    }
+		}
+                
 		$html = '';
 		$sql = "SELECT host,COUNT(*) AS count FROM videos GROUP BY host ";
 		$result = $this->mysqli->query($sql);
@@ -628,6 +637,13 @@ class javfind{
 			$html .= '<td>'.$num.'</td>';
 			$html .= '<td>'.$row['host'].'</td>';
                         $html .= '<td>'.$row['count'].'</td>';
+                        if(isset($host[$row['host']])){
+                            $html .= '<td>'.count($host[$row['host']]).'</td>';
+                        }
+                        else{
+                            $html .= '<td>0</td>';
+                        }
+                        
 			$html .= '</tr>';
 		}
 
