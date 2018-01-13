@@ -54,7 +54,7 @@ $html_domain = $smap->renCodeHtmlForDomain();
 									<th style="width: 20px;">No</th>
 									<th>Host</th>
                                                                         <th>Count</th>
-                                                                        <th>Sites</th>
+                                                                        <th>Unique Site</th>
 								</tr>
 							</thead>
 							<tbody>
