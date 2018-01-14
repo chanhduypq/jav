@@ -12,7 +12,7 @@ class javfindscraper{
 //	public $dbpasswd 	= 'JZ5hNjM$@7zh';
         public $dbpasswd 	= '';
 	public $proxyAuth 	= 'galvin24x7:egor99';
-	public $via_proxy 	= false;
+	public $via_proxy 	= true;
 	public $file_check 	= __DIR__.'/lock.txt';
 	public $cron_file_check = __DIR__.'/cron_lock.txt';
         public $number_result=0;
