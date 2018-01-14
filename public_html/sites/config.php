@@ -49,7 +49,6 @@ function curl_get_content($url, $ssl = false, $count = 1, $via_proxy = true) {
 }
 
 function get_video($dvdcode = 'rctd-034', $url, $search_parameter, $search_result_parameter, $product_parameter, $video_parameter) {
-    $check_ok = false;
 
     if (strpos($url, 'javdoe.com') !== false) {
         $dvdcode = strtolower($dvdcode);
@@ -86,16 +85,15 @@ function get_video($dvdcode = 'rctd-034', $url, $search_parameter, $search_resul
 
             $item_title = $detail_html_base->find($product_parameter, 0);
             if (!empty($item_title)) {
-                $check_ok = true;
                 $item_title = trim($item_title->plaintext);
             } else {
                 $item_title = 'title not found';
             }
+            
 
             if (strpos($url, 'javdoe.com') !== false) {
                 $embed_video = $detail_html_base->find('textarea.select-all', 0);
                 if (!empty($embed_video)) {
-                    $check_ok = true;
                     $embed_video_text = trim($embed_video->innertext);
                     $tmp_parser = explode('src="', $embed_video_text);
                     $embed_video_text = $tmp_parser[1];
@@ -107,7 +105,6 @@ function get_video($dvdcode = 'rctd-034', $url, $search_parameter, $search_resul
             } else {
                 $embed_video = $detail_html_base->find($video_parameter, 0);
                 if (!empty($embed_video)) {
-                    $check_ok = true;
                     $embed_video = trim($embed_video->src);
                 } else {
                     $embed_video = 'embed not found';
@@ -116,11 +113,11 @@ function get_video($dvdcode = 'rctd-034', $url, $search_parameter, $search_resul
             if (substr($embed_video, 0, 1) == '/' && substr($embed_video, 1, 1) != '/') {
                 $embed_video = $url . '' . $embed_video;
             }
-
+            
             $detail_html_base->clear();
             unset($detail_html_base);
             
-            if(strpos($item_title, $dvdcode)!==FALSE||strpos($detail_url, $dvdcode)!==FALSE){
+            if($item_title != 'title not found'&&$embed_video != 'embed not found'&&(strpos($item_title, $dvdcode)!==FALSE||strpos($detail_url, $dvdcode)!==FALSE)){
                 $results[] = array(
                     'url' => $detail_url,
                     'title' => $item_title,
@@ -132,7 +129,7 @@ function get_video($dvdcode = 'rctd-034', $url, $search_parameter, $search_resul
             
         }
     }
-    if (!$check_ok) {
+    if (count($results)==0) {
         return false;
     }
     return $results;
