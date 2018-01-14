@@ -117,7 +117,7 @@ function get_video($dvdcode = 'rctd-034', $url, $search_parameter, $search_resul
             $detail_html_base->clear();
             unset($detail_html_base);
             
-            if($item_title != 'title not found'&&$embed_video != 'embed not found'&&(strpos($item_title, $dvdcode)!==FALSE||strpos($detail_url, $dvdcode)!==FALSE)){
+            if($item_title != 'title not found'&&$embed_video != 'embed not found'&&(strpos(strtolower($item_title), strtolower($dvdcode))!==FALSE||strpos(strtolower($detail_url), strtolower($dvdcode))!==FALSE)){
                 $results[] = array(
                     'url' => $detail_url,
                     'title' => $item_title,
