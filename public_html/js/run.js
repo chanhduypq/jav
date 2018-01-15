@@ -281,6 +281,24 @@ $(function () {
 	//cron_update_track_videos
 	function cron_update_track_videos(){
 		$('#cron-start').click(function(e){
+                    if($("#Database_Search").is(":checked")==false&&$("#Instant_Search").is(":checked")==false){
+                        window.alert("Please select at least one type of search");
+                        return;
+                    }
+                    
+                    if($("#Database_Search").is(":checked")){
+                        database_search='1';
+                    }
+                    else{
+                        database_search='0';
+                    }
+                    
+                    if($("#Instant_Search").is(":checked")){
+                        instant_search='1';
+                    }
+                    else{
+                        instant_search='0';
+                    }
                     
                     $(this).attr('disabled','disabled').css('cursor','not-allowed');
 
@@ -295,7 +313,7 @@ $(function () {
 				type: 'post',
 				url: '/ajax/ajax.php',
 //                                async: false,
-				data: {action: 'startCronTrackCode' , api_scraper: $('#api_scraper').val(),number_result:$('#number_result').val()},
+				data: {action: 'startCronTrackCode' ,database_search:database_search,instant_search:instant_search, api_scraper: $('#api_scraper').val(),number_result:$('#number_result').val()},
 				beforeSend: function () {
 					$('#track_page #loaddingbar').show();
 				},

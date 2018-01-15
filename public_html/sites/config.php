@@ -22,8 +22,14 @@ function curl_get_content($url, $ssl = false, $count = 1, $via_proxy = true) {
     $ch = curl_init();
 
     if ($via_proxy) {
-        $f_contents = file("proxies.txt");
-        $line = trim($f_contents[rand(0, count($f_contents) - 1)]);
+        if(file_exists("proxies.txt")){
+            $f_contents = file("proxies.txt");
+            $line = trim($f_contents[rand(0, count($f_contents) - 1)]);
+        }
+        else{
+            $line='199.115.116.233:1040';
+        }
+        
         curl_setopt($ch, CURLOPT_PROXY, 'http://' . $line);
         curl_setopt($ch, CURLOPT_PROXYUSERPWD, 'galvin24x7:egor99');
     }

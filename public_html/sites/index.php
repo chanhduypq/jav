@@ -395,12 +395,26 @@ $num_rows = $results->num_rows;
                     stopClicked=false;
                     addColumn=false;
                     siteIds=[];
+                    video_hosts=[];
+                    search_parameters=[];
+                    video_parameters=[];
+                    names=[];
+                    urls=[];
+                    detail_parameters=[];
+                    product_parameters=[];
                     var resultAjax='';
-                    var count_ajax=0;
                     <?php 
                     $results1 = $mysqli->query("SELECT * FROM sites ORDER BY id desc");
                     while($row = $results1->fetch_array()) { ?>
-                        <?php echo 'siteIds.push("'.$row['id'].'");'; ?>
+                        <?php 
+                        echo 'siteIds.push("'.$row['id'].'");'; 
+                        echo 'video_hosts.push("'.$row['video_host'].'");'; 
+                        echo 'search_parameters.push("'.$row['search_parameter'].'");'; 
+                        echo 'video_parameters.push("'.$row['video_parameter'].'");'; 
+                        echo 'names.push("'.$row['name'].'");'; 
+                        echo 'detail_parameters.push("'.$row['detail_parameter'].'");'; 
+                        echo 'product_parameters.push("'.$row['product_parameter'].'");'; 
+                        ?>
                     <?php 
                     } 
                     $mysqli->close();
@@ -414,7 +428,8 @@ $num_rows = $results->num_rows;
                             }
                           $('#loaddingbar').css('visibility', 'hidden');
                           $('form#search_form1 input[type="submit"]').removeAttr('disabled').css('cursor','pointer');
-                          if(count_ajax>0){
+                          
+                          if($("#sites tbody img").length>0){
                               $("#clear").show();
                           }
                        });
@@ -427,7 +442,6 @@ $num_rows = $results->num_rows;
                         
                         $('form#search_form1 input[type="submit"]').on('click', function (e) {
                             stopClicked=false;
-                            count_ajax=0;
                             resultAjax='';
                             $('form#search_form1 input[type="submit"]').attr('disabled','disabled').css('cursor','not-allowed');
                             $("#no_data").hide();
@@ -444,6 +458,25 @@ $num_rows = $results->num_rows;
                                         return;
                                 }
                                 else{
+                                    
+                                    if($("#sites tbody img").length==siteIds.length){
+                                        addColumn=false;
+                                        $("tr."+$('form#search_form1 input[type="text"]').val().trim()).removeClass($('form#search_form1 input[type="text"]').val().trim());
+                                        $("#sites thead").html('<tr><th>Name</th><th>Url</th><th>Search parameter</th><th>Detail page parameter</th><th>Product title parameter</th><th></th></tr>');
+                                        for(j=0;j<$("#sites tbody tr").length;j++){
+                                            $("#sites tbody tr").eq(j).find('td').eq(5).remove();
+                                        }
+                                        for(i=0;i<siteIds.length;i++){
+                                            siteId=siteIds[i];
+                                            $("tr#site_"+siteId).find('td').eq(0).html(names[i]);
+                                            $("tr#site_"+siteId).find('td').eq(1).html(urls[i]);
+                                            $("tr#site_"+siteId).find('td').eq(2).html(search_parameters[i]);
+                                            $("tr#site_"+siteId).find('td').eq(3).html(detail_parameters[i]);
+                                            $("tr#site_"+siteId).find('td').eq(4).html(product_parameters[i]);
+                                            $("tr#site_"+siteId).find('td').eq(5).html('<div style="display: inline-block;" onclick="edit_site('+siteId+')" class="btn">Edit</div>');
+
+                                        }
+                                    }
                                     runAjax();
                                     
 
@@ -463,11 +496,11 @@ $num_rows = $results->num_rows;
                                     success: function (result) {
 
                                         console.log(result);
-                                        count_ajax++;
                                         if(stopClicked==false){
                                             $("tr#site_"+siteId).removeClass('progress-label');
 
                                             $("#sites thead").html('<tr><th>Name</th><th>Url</th><th>Site detail url</th><th>Name of product</th><th>Host url</th><th></th><th></th></tr>');
+                                            
                                             if(addColumn==false){
                                                 for(j=0;j<$("#sites tbody tr").length;j++){
                                                     $("#sites tbody tr").eq(j).find('td:last').before("<td></td>");
@@ -476,17 +509,16 @@ $num_rows = $results->num_rows;
                                             }
                                             $("tr#site_"+siteId).replaceWith(result);
 
-                                            if(count_ajax==siteIds.length){
+                                            if($("#sites tbody img").length==siteIds.length){
 
                                                 $('#loaddingbar').css('visibility', 'hidden');
                                                 $('form#search_form1 input[type="submit"]').removeAttr('disabled').css('cursor','pointer');
                                                 $("#clear").show();
                                             }
                                         }
-//                                                    count_ajax++;
 //                                                    resultAjax+=result;
 //                                                        
-//                                                    if(count_ajax==siteIds.length&&stopClicked==false){
+//                                                    if($("#sites tbody img").length==siteIds.length&&stopClicked==false){
 //                                                        for(i=0;i<siteIds.length;i++){
 //                                                            siteId=siteIds[i];
 //                                                            $("tr#site_"+siteId).removeClass('progress-label');

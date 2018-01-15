@@ -19,7 +19,7 @@ if(isset($_POST['action'])){
                     $trk = new javfindscraper;
                 }
 //		$trk = new javfind;
-		$status = $trk->startCronTrackcode($number_result);
+		$status = $trk->startCronTrackcode($number_result,$_POST['database_search'],$_POST['instant_search']);
 		echo json_encode($status);
 		exit;
 	}
