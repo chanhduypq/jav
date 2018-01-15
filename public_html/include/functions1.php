@@ -741,7 +741,7 @@ class javfindscraper{
 	// @getSiteNum
 	function getSiteNum($code_id){
 
-		$sql = "SELECT COUNT(DISTINCT(`domain`)) FROM videos WHERE `code_id` = '{$code_id}' ";
+		$sql = "SELECT COUNT(DISTINCT(`link`)) FROM videos WHERE `code_id` = '{$code_id}' ";
 		$result = $this->mysqli->query($sql);
 		$count = $result->fetch_row();
 
@@ -754,7 +754,7 @@ class javfindscraper{
 	// @getSourceNum
 	function getSourceNum($code_id){
 
-		$sql = "SELECT COUNT(DISTINCT(`host`)) FROM videos WHERE `code_id` = '{$code_id}' ";
+		$sql = "SELECT COUNT(DISTINCT(`source`)) FROM videos WHERE `code_id` = '{$code_id}' ";
 		$result = $this->mysqli->query($sql);
 		$count = $result->fetch_row();
 
