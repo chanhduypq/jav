@@ -12,7 +12,7 @@ class javfindscraper{
 //	public $dbpasswd 	= 'JZ5hNjM$@7zh';
         public $dbpasswd 	= '';
 	public $proxyAuth 	= 'galvin24x7:egor99';
-	public $via_proxy 	= true;
+	public $via_proxy 	= false;
 	public $file_check 	= __DIR__.'/lock.txt';
 	public $cron_file_check = __DIR__.'/cron_lock.txt';
         public $number_result=0;
@@ -57,6 +57,7 @@ class javfindscraper{
 		$check = false;
 		$result = array('status'=>0, 'html'=>'');
 		$html = $this->curl_execute($url);
+                var_dump($html);
 		if($this->getDetails($html,$code_id,$code)){
 			$check = true;
 		}
@@ -138,6 +139,7 @@ class javfindscraper{
 				}
 
 				if($tmp!==false && trim($tmp)!='' && strrpos($tmp, 'http://')===false && strrpos($tmp, 'https://')===false ){
+                                    var_dump('more');
 					$tmp = explode('?', $tmp);
 					$tmp = 'http://pron.tv'.trim($tmp[0]);
 					if($this->getMoreDetails($tmp,$code_id,$code_value)){
@@ -145,6 +147,7 @@ class javfindscraper{
 					}
 				}
 				else{
+                                    var_dump('more1');
 					//jack code for current
 					$data = array(
 							'title'=>'',
@@ -864,6 +867,7 @@ class javfindscraper{
 		curl_setopt($ch, CURLOPT_TIMEOUT, 5);
 		curl_setopt($ch, CURLOPT_ENCODING, 'gzip, deflate');
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+//                curl_setopt($ch, CURLOPT_CAINFO, 'crawlera-ca.crt'); //required for HTTPS
 		$content = curl_exec($ch);
 		$status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 		curl_close($ch);
