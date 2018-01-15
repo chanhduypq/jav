@@ -25,6 +25,8 @@
                                   <li><a href="statistic.php">Statistic</a></li>
                                   <li class="active"><a href="ultrasound.php">Copyright !</a></li>
                                   <li><a href="sites">Instant Search</a></li>
+                                  <li><a href="torrent/public/">Torrent Search</a></li>
+                                  <li><a href="google/public/">Engine Search</a></li>
 				</ul>
 			  </div>
 			</nav>

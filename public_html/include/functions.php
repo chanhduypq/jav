@@ -459,16 +459,18 @@ class javfind{
             
 		//loop all dvd code
             $codes = $this->getAllTrackCode();
+            
             foreach ($codes as $code) {
                 if($database_search=='1'){
                     $this->findVideos1($code['value'],$number_result, $code['id']);
                 }
                 if($instant_search=='1'){
                     foreach ($sites as $row){
+                        $i=1;
                         $video = get_video($code['value'], $row['url'], $row['search_parameter'], $row['search_result_parameter'], $row['product_parameter'], $row['video_parameter']);
                         if ($video !== FALSE) {
                             foreach ($video as $temp) {
-                                if(count($search_data)<$number_result){
+                                if(!is_numeric($number_result)||$i<=$number_result){
                                     $row['real_url'] = $temp['url'];
                                     $row['real_title'] = $temp['title'];
                                     $row['real_host'] = $temp['embed'];
@@ -483,6 +485,7 @@ class javfind{
                                     $row['quality'] = '';
                                     $row['date']=date('Y-m-d');
                                     $search_data[] = $row;
+                                    $i++;
                                 }
                             }
                         } 
@@ -506,10 +509,10 @@ class javfind{
                                         '". $this->mysqli->real_escape_string($data['language'])."',
                                         '". $this->mysqli->real_escape_string($data['size'])."',
                                         '". $this->mysqli->real_escape_string($data['quality'])."',
-                                        '". $this->mysqli->real_escape_string($data['date'])."',
+                                        NULL,
                                          '". $createdAt."');";
                         // mysqli_query
-//                        $this->mysqli->query($sql);
+                        $this->mysqli->query($sql);
                     
                 }
             }
@@ -619,7 +622,7 @@ class javfind{
 	function getFirstDate($code_id){
 		
 		$result_date = '';
-		$sql = "SELECT  `date` FROM `videos` WHERE `code_id` = '{$code_id}' ORDER BY `date` ASC LIMIT 0,1 ";
+		$sql = "SELECT  `date` FROM `videos` WHERE `code_id` = '{$code_id}' and `date` is not null ORDER BY `date` ASC LIMIT 0,1 ";
 		$result = $this->mysqli->query($sql);
 		while ($row = $result->fetch_assoc()) {
 			$result_date = $row['date'];
@@ -632,7 +635,7 @@ class javfind{
 	function getLatestDate($code_id){
 
 		$result_date = '';
-		$sql = "SELECT  `date` FROM `videos` WHERE `code_id` = '{$code_id}' ORDER BY `date` DESC LIMIT 0,1 ";
+		$sql = "SELECT  `date` FROM `videos` WHERE `code_id` = '{$code_id}' and `date` is not null ORDER BY `date` DESC LIMIT 0,1 ";
 		$result = $this->mysqli->query($sql);
 		while ($row = $result->fetch_assoc()) {
 			$result_date = $row['date'];
@@ -683,7 +686,7 @@ class javfind{
         function renCodeHtmlForHost(){
 
                 $host=array();
-                $sql = "SELECT * FROM videos";
+                $sql = "SELECT * FROM videos where host<>''";
 		$result = $this->mysqli->query($sql);
                 while ($row = $result->fetch_assoc()) {
                     if(strpos($row['link'], $row['host'])!==FALSE){
@@ -692,7 +695,7 @@ class javfind{
 		}
                 
 		$html = '';
-		$sql = "SELECT host,COUNT(*) AS count FROM videos GROUP BY host ";
+		$sql = "SELECT host,COUNT(*) AS count FROM videos where host<>'' GROUP BY host ";
 		$result = $this->mysqli->query($sql);
 		$num=0;
 		while ($row = $result->fetch_assoc()) {
@@ -726,7 +729,7 @@ class javfind{
 		}
                 
 		$html = '';
-		$sql = "SELECT domain,COUNT(*) AS count FROM videos GROUP BY domain ";
+		$sql = "SELECT domain,COUNT(*) AS count FROM videos where domain<>'' GROUP BY domain ";
 		$result = $this->mysqli->query($sql);
 		$num=0;
 		while ($row = $result->fetch_assoc()) {

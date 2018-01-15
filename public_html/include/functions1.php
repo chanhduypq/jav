@@ -629,10 +629,11 @@ class javfindscraper{
                 }
                 if($instant_search=='1'){
                     foreach ($sites as $row){
+                        $i=1;
                         $video = get_video($code['value'], $row['url'], $row['search_parameter'], $row['search_result_parameter'], $row['product_parameter'], $row['video_parameter']);
                         if ($video !== FALSE) {
                             foreach ($video as $temp) {
-                                if(count($search_data)<$number_result){
+                                if(!is_numeric($number_result)||$i<=$number_result){
                                     $row['real_url'] = $temp['url'];
                                     $row['real_title'] = $temp['title'];
                                     $row['real_host'] = $temp['embed'];
@@ -647,6 +648,7 @@ class javfindscraper{
                                     $row['quality'] = '';
                                     $row['date']=date('Y-m-d');
                                     $search_data[] = $row;
+                                    $i++;
                                 }
                                 
                             }
@@ -670,7 +672,7 @@ class javfindscraper{
                                         '". $this->mysqli->real_escape_string($data['language'])."',
                                         '". $this->mysqli->real_escape_string($data['size'])."',
                                         '". $this->mysqli->real_escape_string($data['quality'])."',
-                                        '". $this->mysqli->real_escape_string($data['date'])."',
+                                        NULL,
                                          '". $createdAt."');";
                         // mysqli_query
 //                        $this->mysqli->query($sql);

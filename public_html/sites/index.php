@@ -228,7 +228,7 @@ $num_rows = $results->num_rows;
 			<nav class="navbar navbar-default" style="margin-bottom: 5px;">
 			  <div class="container-fluid">
 				<div class="navbar-header">
-				  <a class="navbar-brand" href="index.php">Jav Tool</a>
+				  <a class="navbar-brand" href="/index.php">Jav Tool</a>
 				</div>
 				<ul class="nav navbar-nav">
 				  <li><a href="../index.php">Database Search</a></li>
@@ -236,6 +236,8 @@ $num_rows = $results->num_rows;
                                   <li><a href="../statistic.php">Statistic</a></li>
                                   <li><a href="../ultrasound.php">Copyright !</a></li>
                                   <li class="active"><a href="/sites">Instant Search</a></li>
+                                  <li><a href="/torrent/public/">Torrent Search</a></li>
+                                  <li><a href="/google/public/">Engine Search</a></li>
 				</ul>
 			  </div>
 			</nav>
