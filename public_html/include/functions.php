@@ -566,7 +566,7 @@ class javfind{
 	function showSitesDetails($code_id){
 
 		$html = '';
-		$sql = "SELECT DISTINCT(`link`) FROM videos WHERE`code_id` = '{$code_id}' AND `link` <> '' ";
+		$sql = "SELECT DISTINCT(`link`) FROM videos WHERE`code_id` = '{$code_id}' AND `link` <> '' ORDER BY `link` ASC ";
 		$result = $this->mysqli->query($sql);
 		$num=0;
 		while ($row = $result->fetch_assoc()) {
@@ -580,7 +580,7 @@ class javfind{
 	function showSourceDetails($code_id){
 
 		$html = '';
-		$sql = "SELECT DISTINCT(`source`) FROM videos WHERE`code_id` = '{$code_id}' AND `source` <> '' ";
+		$sql = "SELECT DISTINCT(`source`) FROM videos WHERE`code_id` = '{$code_id}' AND `source` <> '' ORDER BY `source` ASC ";
 		$result = $this->mysqli->query($sql);
 		$num=0;
 		while ($row = $result->fetch_assoc()) {

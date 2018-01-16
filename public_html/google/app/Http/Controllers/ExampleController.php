@@ -24,7 +24,8 @@ class ExampleController extends Controller
         $params = [];
         $toIndex = 10;
         $NUMBER_ROW_PERPAGE=10;
-        $count=100;
+        $count=0;
+        $errorText='';
         
         if ($request->post('page') && ctype_digit($request->post('page'))) {
             $page = $request->post('page');
@@ -52,6 +53,13 @@ class ExampleController extends Controller
             curl_close($ch);
 
             $result = json_decode($result);
+            if(isset($result->error)){
+                  $error=$result->error->errors;
+                  $error=$error[0];
+                  $errorText.="message: ".$error->message;
+                  $errorText.= "<br>";
+                  $errorText.= "reason: ".$error->reason;
+              }
             
             $url = "https://api.duckduckgo.com/?q={$searchTermsFiltred}&format=json&pretty=1";
 
@@ -71,18 +79,14 @@ class ExampleController extends Controller
             // echo "<pre>";
             // print_r($result); die();
 
-            if (isset($result->error) && $result->error->code == 400) {
-                return view('home', [
-                    'result' => null,
-                    'result1' => $result1,
-                    'search_terms' => $searchTerms ?? '',
-                    'to_index' => $toIndex,
-                    'error' => 'Bad request',
-                    'total_pages' => $this->totalPages,
-                    'page'=>$page,
-                    'count'=>$count,
-                    'NUMBER_ROW_PERPAGE'=>$NUMBER_ROW_PERPAGE,
-                ]);
+            if (isset($result->queries)) {
+                if (isset($result->queries->totalResults)) {
+                    $count = $result->queries->totalResults;
+                } else {
+                    $temp = $result->queries;
+                    $temp = $temp[0];
+                    $count = $temp->totalResults;
+                }
             }
 
             if (!isset($result->items)) {
@@ -90,18 +94,12 @@ class ExampleController extends Controller
                     'result' => null,
                     'result1' => $result1,
                     'search_terms' => $searchTerms ?? '',
-                    'to_index' => $toIndex,
-                    'total_pages' => $this->totalPages,
+                    'error' => $errorText,
                     'page'=>$page,
                     'count'=>$count,
                     'NUMBER_ROW_PERPAGE'=>$NUMBER_ROW_PERPAGE,
                 ]);
             }
-
-
-            // echo "<pre>";
-            // print_r($result);
-            // die();;
         }
 
         return view('home', [
@@ -109,10 +107,9 @@ class ExampleController extends Controller
             'result1' => $result1 ?? null,
             'search_terms' => $searchTerms ?? '',
             'params' => $params,
-            'total_pages' => $this->totalPages,
-            'to_index' => $toIndex,
             'page'=>$page,
             'count'=>$count,
+            'error' => $errorText,
             'NUMBER_ROW_PERPAGE'=>$NUMBER_ROW_PERPAGE,
         ]);
     }

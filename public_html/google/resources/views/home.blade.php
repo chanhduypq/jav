@@ -33,15 +33,26 @@
                 </div>
             </div>
 
-            @if (isset($result) && sizeof($result) > 0)
-                <div class="list-group<?php if($search_terms!='') echo ' searched';?>" style="width: 45%;float: left;margin-right: 10%;">
-                  @foreach ($result->items as $item)
+            <?php 
+            if(trim($error)!=''){?>
+                <div class="list-group searched" style="width: 45%;color: red;float: left;margin-right: 10%;">
+                      <?php 
+                      echo $error;
+                      ?>
+                </div>
+            <?php 
+            }
+            else{
+                if (isset($result->items) && count($result->items) > 0){?>
+                <div class="list-grou searched" style="width: 45%;float: left;margin-right: 10%;">
+                  <?php foreach ($result->items as $item){?>
                     <a href="{{ $item->link }}" class="list-group-item" target="_blank">
                         <h4 class="list-group-item-heading">{{ $item->title }}</h4>
                         <p class="list-group-item-text">{{ $item->snippet }}</p>
                     </a>
-                  @endforeach
+                  
                   <?php 
+                  }
                   if ($count > 0) {?>
                       <ul class="pagination pagination-lg">
                       <?php 
@@ -126,13 +137,18 @@
                     }
                     ?>
                 </div>
-            @else
+            <?php
+                }
+                else{?>
                  <div class="list-group<?php if($search_terms!='') echo ' searched';?>" style="width: 45%;float: left;margin-right: 10%;">
-                  @if ($search_terms!='') 
-                      no result 
-                  @endif                  
+                  <?php if ($search_terms!='') echo 'no result';?>  
                 </div>
-            @endif
+            
+            <?php 
+                }
+            }
+            ?>
+            
             
                 <div class="list-group<?php if($search_terms!='') echo ' searched';?>" style="width: 45%;float: left;">
                     <?php if (isset($result1) && is_array($result1)&& count($result1) > 0){?>
