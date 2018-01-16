@@ -8,6 +8,13 @@
     #custom-search-input{
         margin-bottom: 20px;
     }
+    .list-group.searched{
+        border: 1px solid black;
+        -webkit-border-radius: 5px;
+        -moz-border-radius: 5px;
+        border-radius: 5px;
+        padding: 20px;
+    }
 </style>	
 <div class="container">
     <div class="row">
@@ -27,7 +34,7 @@
             </div>
 
             @if (isset($result) && sizeof($result) > 0)
-                <div class="list-group" style="width: 45%;float: left;margin-right: 10%;<?php if($search_terms!='') echo 'border: 1px solid black;';?>">
+                <div class="list-group<?php if($search_terms!='') echo ' searched';?>" style="width: 45%;float: left;margin-right: 10%;">
                   @foreach ($result->items as $item)
                     <a href="{{ $item->link }}" class="list-group-item" target="_blank">
                         <h4 class="list-group-item-heading">{{ $item->title }}</h4>
@@ -120,14 +127,14 @@
                     ?>
                 </div>
             @else
-                 <div class="list-group" style="width: 45%;float: left;margin-right: 10%;<?php if($search_terms!='') echo 'border: 1px solid black;';?>">
+                 <div class="list-group<?php if($search_terms!='') echo ' searched';?>" style="width: 45%;float: left;margin-right: 10%;">
                   @if ($search_terms!='') 
                       no result 
                   @endif                  
                 </div>
             @endif
             
-                <div class="list-group" style="width: 45%;float: left;<?php if($search_terms!='') echo 'border: 1px solid black;';?>">
+                <div class="list-group<?php if($search_terms!='') echo ' searched';?>" style="width: 45%;float: left;">
                     <?php if (isset($result1) && is_array($result1)&& count($result1) > 0){?>
                   <?php for ($i=0;$i<count($result1);$i++){?>
                       
