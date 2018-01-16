@@ -23,6 +23,15 @@ class ExampleController extends Controller
         $result = [];
         $params = [];
         $toIndex = 10;
+        $NUMBER_ROW_PERPAGE=10;
+        $count=100;
+        
+        if ($request->post('page') && ctype_digit($request->post('page'))) {
+            $page = $request->post('page');
+        } else {
+            $page = 1;
+        }
+        $offset = ($page - 1) * $NUMBER_ROW_PERPAGE;
 
         if ($searchTerms = $request->post('search_terms')) {
 
@@ -33,7 +42,8 @@ class ExampleController extends Controller
             $key = "AIzaSyB16wvV51-FSuB4n5dbGgNqtxLuRWh5z8s";
             $cx = "007043409519568967944:zqts7n3gnc4";
 
-            $url = "https://www.googleapis.com/customsearch/v1?start={$toIndex}&key={$key}&cx={$cx}&q={$searchTermsFiltred}";
+//            $url = "https://www.googleapis.com/customsearch/v1?start={$toIndex}&key={$key}&cx={$cx}&q={$searchTermsFiltred}";
+            $url = "https://www.googleapis.com/customsearch/v1?start={$offset}&key={$key}&cx={$cx}&q={$searchTermsFiltred}";
 
             $ch = curl_init($url);
             curl_setopt( $ch , CURLOPT_SSL_VERIFYPEER , false );
@@ -63,40 +73,31 @@ class ExampleController extends Controller
 
             if (isset($result->error) && $result->error->code == 400) {
                 return view('home', [
-                    'enabled_search' => true,
                     'result' => null,
                     'result1' => $result1,
                     'search_terms' => $searchTerms ?? '',
-                    'next_page' => null,
                     'to_index' => $toIndex,
-                    'clear_search' => true,
                     'error' => 'Bad request',
                     'total_pages' => $this->totalPages,
-                    'real_next_page' => $nextPage ?? true,
+                    'page'=>$page,
+                    'count'=>$count,
+                    'NUMBER_ROW_PERPAGE'=>$NUMBER_ROW_PERPAGE,
                 ]);
             }
 
             if (!isset($result->items)) {
                 return view('home', [
-                    'enabled_search' => $toIndex == 10 && $result ? true : false,
                     'result' => null,
                     'result1' => $result1,
                     'search_terms' => $searchTerms ?? '',
-                    'next_page' => null,
-                    'real_next_page' => $nextPage ?? false,
                     'to_index' => $toIndex,
-                    'clear_search' => true,
                     'total_pages' => $this->totalPages,
+                    'page'=>$page,
+                    'count'=>$count,
+                    'NUMBER_ROW_PERPAGE'=>$NUMBER_ROW_PERPAGE,
                 ]);
             }
 
-            $nextPageArray = $result->queries->nextPage;
-
-            $nextPage = false;
-
-            if ($nextPageArray && sizeof($nextPageArray) > 0) {
-                $nextPage = true;
-            }
 
             // echo "<pre>";
             // print_r($result);
@@ -108,12 +109,11 @@ class ExampleController extends Controller
             'result1' => $result1 ?? null,
             'search_terms' => $searchTerms ?? '',
             'params' => $params,
-            'next_page' => $nextPage ?? 11,
-            'real_next_page' => $nextPage ?? false,
-            'enabled_search' => true,
             'total_pages' => $this->totalPages,
             'to_index' => $toIndex,
-            'clear_search' => true,
+            'page'=>$page,
+            'count'=>$count,
+            'NUMBER_ROW_PERPAGE'=>$NUMBER_ROW_PERPAGE,
         ]);
     }
 
