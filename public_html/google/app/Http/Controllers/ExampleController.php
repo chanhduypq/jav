@@ -32,7 +32,7 @@ class ExampleController extends Controller
         } else {
             $page = 1;
         }
-        $offset = ($page - 1) * $NUMBER_ROW_PERPAGE;
+        $offset = ($page - 1) * $NUMBER_ROW_PERPAGE+1;
 
         if ($searchTerms = $request->post('search_terms')) {
 
@@ -83,9 +83,12 @@ class ExampleController extends Controller
                 if (isset($result->queries->totalResults)) {
                     $count = $result->queries->totalResults;
                 } else {
-                    $temp = $result->queries;
+                    $temp = $result->queries->request;
+                    
                     $temp = $temp[0];
+                    
                     $count = $temp->totalResults;
+                    
                 }
             }
 
