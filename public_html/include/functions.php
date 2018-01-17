@@ -522,6 +522,13 @@ class javfind{
 
             return $result;
 	}
+        
+        function getCurrentTracker(){
+
+            $result = array('status'=>1, 'html'=>$this->renCodeHtml());
+
+            return $result;
+	}
 
 	// @getAllTrackCode
 	function getAllTrackCode(){

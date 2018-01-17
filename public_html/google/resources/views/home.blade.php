@@ -65,8 +65,8 @@
                         $start = $range * $rangeCount - ($rangeCount - 1);
 
                         if ($page == 1) {
-                            $hrefPrev = "#";
-                            $hrefFirst = "#";
+                            $hrefPrev = "javascript:void(0)";
+                            $hrefFirst = "javascript:void(0)";
                             $classPrevFirst = "active";
                         } else {
                             $hrefFirst=route('index.search', [
@@ -81,8 +81,8 @@
                         }
 
                         if ($page == $numberPage) {
-                            $hrefNext = "#";
-                            $hrefLast = "#";
+                            $hrefNext = "javascript:void(0)";
+                            $hrefLast = "javascript:void(0)";
                             $classNextLast = "active";
                         } else {
                             $hrefLast=route('index.search', [
@@ -107,7 +107,7 @@
                                 <?php
                                 for ($i = 1; $i <= 3 && $start <= $numberPage; $i++) {
                                     if ($page == $start) {
-                                        $href = "#";
+                                        $href = "javascript:void(0)";
                                         $class = 'active';
                                     } else {
                                         $href =route('index.search', [

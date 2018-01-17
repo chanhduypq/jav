@@ -74,6 +74,13 @@ if(isset($_POST['action'])){
                 echo json_encode($status);
                 exit;
 	}
+        elseif( $_POST['action']=='getCurrentTracker'){
+
+		$trk = new javfind;
+		$status = $trk->getCurrentTracker();
+		echo json_encode($status);
+		exit;
+	}
 	//stop search funtions
 	elseif( $_POST['action']=='stopsearchvideos' ){
 		

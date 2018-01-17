@@ -101,9 +101,9 @@ if(isset($_POST['csv_export']) && $_POST['csv_export']=='ok'){
 
 				<div class="col-md-3" style="margin-bottom: 15px;">
 					<div class="row" id="loaddingbar" style="display: none;">
-<!--						<div class="col-md-4" style="margin-bottom: 15px;">
+						<div class="col-md-4" style="margin-bottom: 15px;">
 							<button type="button" id="stop" class="btn btn-warning btn-block"><span class="glyphicon glyphicon-stop"></span> Stop</button>
-						</div>-->
+						</div>
 						<div class="col-md-8">
 							<div id="progressbar" class="progress-label">Loading...</div>
 						</div>
@@ -206,8 +206,21 @@ if(isset($_POST['csv_export']) && $_POST['csv_export']=='ok'){
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" ></script>
 		<script src="js/run.js?<?php echo substr(md5(mt_rand()), 0, 7);?>"></script>
                 <script type="text/javascript">
-                    $( function() {
-                        
+                    stopClicked=false;
+                    jQuery(function ($){
+                       
+                       $("#stop").click(function (){
+                           var alert = $("#alert");
+                           stopClicked=true;
+                          $('#loaddingbar').hide();
+                          $('#cron-start').removeAttr('disabled').css('cursor','pointer');
+                          if($("#sitem-table .site_detail").length>0||$("#sitem-table .source_detail").length>0){
+                                $("#csv_export button").removeAttr('disabled').css('cursor','pointer');
+                            }
+                          updatecodesresults();                
+                       });
+                       
+                       
                     });
                 </script>
 	</body>

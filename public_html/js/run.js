@@ -44,6 +44,38 @@ function getCurrentVideos() {
         }
     });
 }
+
+function updatecodesresults() {
+    var alert = $("#alert");
+    $.ajax({
+
+            type: 'post',
+            url: '/ajax/ajax.php',
+            async: false,
+            data: {action: 'getCurrentTracker' },
+            success: function (result) {
+                $('#cron-start').removeAttr('disabled').css('cursor','pointer');
+                if($("#sitem-table .site_detail").length>0||$("#sitem-table .source_detail").length>0){
+                    $("#csv_export button").removeAttr('disabled').css('cursor','pointer');
+                }
+                    console.log(result);
+                    var data = JSON.parse(result);
+                    $('#track_page #loaddingbar').hide();
+                    if(data.status=='0'){
+                            $(alert).html('<p class="alert alert-warning">can\'t Update or database is latest.</p>');
+                    }
+                    else if(data.status=='1'){
+                            $(alert).html('<p class="alert alert-info">Database is Updated</p>');
+                            $("#track_page #sitem-table tbody").html(data.html);
+                            $("#csv_export button").removeAttr('disabled').css('cursor','pointer');
+                    }
+                    else{
+                            $(alert).html('<p class="alert alert-danger">Error</p>');
+                    }
+                    $(alert).css('visibility', 'visible');
+            }
+    });
+}
 $(function () {
 
 	//delete callback
@@ -62,7 +94,6 @@ $(function () {
 	cron_update_track_videos();
 	show_sites_details();
 	show_source_details();
-	stops_cron_videos();
         if($("#sitem-table .site_detail").length>0||$("#sitem-table .source_detail").length>0){
             $("#csv_export button").removeAttr('disabled').css('cursor','pointer');
         }
@@ -281,6 +312,7 @@ $(function () {
 	//cron_update_track_videos
 	function cron_update_track_videos(){
 		$('#cron-start').click(function(e){
+                    stopClicked=false;
                     if($("#Database_Search").is(":checked")==false&&$("#Instant_Search").is(":checked")==false){
                         window.alert("Please select at least one type of search");
                         return;
@@ -301,6 +333,7 @@ $(function () {
                     }
                     
                     $(this).attr('disabled','disabled').css('cursor','not-allowed');
+                    $("#csv_export button").attr('disabled','disabled').css('cursor','not-allowed');
 
 			var alert = $("#track_page #alert");
 			alert.html('');
@@ -322,7 +355,12 @@ $(function () {
 				},
 				success: function (result) {
                                     $('#cron-start').removeAttr('disabled').css('cursor','pointer');
-//					updatecodesresults();
+                                    if($("#sitem-table .site_detail").length>0||$("#sitem-table .source_detail").length>0){
+                                        $("#csv_export button").removeAttr('disabled').css('cursor','pointer');
+                                    }
+                                    if(stopClicked){                                                
+                                        return;
+                                    }
                                         console.log(result);
 					var data = JSON.parse(result);
 					$('#track_page #loaddingbar').hide();
@@ -344,46 +382,6 @@ $(function () {
 			//return
 			return false;
 		});
-	}
-
-	//stops_cron_videos
-	function stops_cron_videos(){
-		$('#track_page #stop').on('click', function (e) {
-			$.ajax({
-				type: 'post',
-				url: '/ajax/ajax.php',
-				data: {action: 'stopcronvideos'},
-				success: function (result) {
-					updatecodesresults();
-				}
-			});
-			return false;
-		});
-	}
-
-	//updatecodesresults
-	function updatecodesresults(){
-
-		if($("body#track_page").length>0){
-
-			$.ajax({
-				type: 'post',
-				url: '/ajax/ajax.php',
-				data: {action: 'updatecodesresults'},
-				success: function (result) {
-					var data = JSON.parse(result);
-					$("#track_page #sitem-table tbody").html(data.html);
-                                        $("#csv_export button").removeAttr('disabled').css('cursor','pointer');
-					if(data.loadding=='1'){
-						$('#track_page #loaddingbar').show();
-					}
-					else{
-						$('#track_page #loaddingbar').hide();
-					}
-				}
-			});
-		}
-		
 	}
 
 	//updatecronstatus
