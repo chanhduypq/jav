@@ -14,7 +14,7 @@ $html_domain = $smap->renCodeHtmlForDomain();
 		<meta charset="utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title>Jav Tool | Statistic</title>
+		<title>Jav Tool | Rules</title>
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" >
 		<link rel="stylesheet"  href="css/styles.css" >
 		<!--[if lt IE 9]>
@@ -25,13 +25,13 @@ $html_domain = $smap->renCodeHtmlForDomain();
 	<body id="track_page">
 		<div class="loading" id="loading" style="display: none;">Loading&#8230;</div>
 		<div class="container">
-			<?php include_once 'menu.php';?>
+                    <?php include_once 'menu.php';?>
 		</div>
 				   
 		<div class="container" style="min-height: 400px;">
 
-
-                    <h3>Host</h3>
+pending
+<!--                    <h3>Host</h3>
 			<div class="row">
 				<div class="col-lg-12 col-md-12">
 					<div class="table-responsive">
@@ -79,7 +79,7 @@ $html_domain = $smap->renCodeHtmlForDomain();
 						</table>
 					</div>
 				</div>
-			</div>
+			</div>-->
 
 		</div>
 

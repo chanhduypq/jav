@@ -42,22 +42,7 @@ if(isset($_POST['csv_export']) && $_POST['csv_export']=='ok'){
 	<body id="home_page">
 		<div class="loading" id="loading" style="display: none;">Loading&#8230;</div>
 		<div class="container">
-			<nav class="navbar navbar-default" style="margin-bottom: 5px;">
-			  <div class="container-fluid">
-				<div class="navbar-header">
-				  <a class="navbar-brand" href="index.php">Jav Tool</a>
-				</div>
-				<ul class="nav navbar-nav">
-				  <li class="active"><a href="index.php">Database Search</a></li>
-				  <li><a href="track.php">Jav Track</a></li>
-                                  <li><a href="statistic.php">Statistic</a></li>
-                                  <li><a href="ultrasound.php">Copyright !</a></li>
-                                  <li><a href="sites">Instant Search</a></li>
-                                  <li><a href="torrent/public/">Torrent Search</a></li>
-                                  <li><a href="google/public/">Engine Search</a></li>
-				</ul>
-			  </div>
-			</nav>
+			<?php include_once 'menu.php';?>
 		</div>
 				   
 		<div class="container" style="min-height: 400px;">
@@ -170,7 +155,10 @@ if(isset($_POST['csv_export']) && $_POST['csv_export']=='ok'){
 			</div>
 
 		</div>
-
+<!--                <div>
+                    <iframe id="tuetc" src="http://pron.tv/stream/rctd-034" style="width: 100%;height: 100%;"></iframe>
+                </div>
+                <div id="demo"></div>-->
 		<footer class="m-t">
 			<div class="container">
 				<div class="panel panel-default">
@@ -205,6 +193,8 @@ if(isset($_POST['csv_export']) && $_POST['csv_export']=='ok'){
                 <script>
                     stopClicked=false;
                     jQuery(function ($){
+//                        alert($("#tuetc").contents().find(".cc_banner-wrapper").html());
+//                        $("#demo").html($("#tuetc").contents().find("body").html());
                        $("#number_result").change(function (){
                           $("#limit").val($(this).val()); 
                        }); 

@@ -44,7 +44,7 @@
             }
             else{
                 if (isset($result->items) && count($result->items) > 0){?>
-                <div class="list-grou searched" style="width: 45%;float: left;margin-right: 10%;">
+                <div class="list-group searched" style="width: 45%;float: left;margin-right: 10%;">
                   <?php foreach ($result->items as $item){?>
                     <a href="{{ $item->link }}" class="list-group-item" target="_blank">
                         <h4 class="list-group-item-heading">{{ $item->title }}</h4>
