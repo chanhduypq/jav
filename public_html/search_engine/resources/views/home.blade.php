@@ -2,6 +2,9 @@
 
 @section('content')
 <style>
+    .pagination.pagination-lg{
+        width: 120%;
+    }
     .pagination.pagination-lg li{
         padding: 5px;
     }

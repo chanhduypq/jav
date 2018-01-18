@@ -14,7 +14,7 @@
 	</head>
 	<body id="track_page">
 		<div class="container">
-			<?php include_once '../../menu.php';?>
+			<?php include_once '../menu.php';?>
 		</div>
 				   
 		<div class="container">

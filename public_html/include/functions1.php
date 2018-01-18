@@ -756,7 +756,7 @@ class javfindscraper{
 	// @getSourceNum
 	function getSourceNum($code_id){
 
-		$sql = "SELECT COUNT(DISTINCT(`source`)) FROM videos WHERE `code_id` = '{$code_id}' ";
+		$sql = "SELECT COUNT(DISTINCT(`source`)) FROM videos WHERE `source`<>'' and `code_id` = '{$code_id}' ";
 		$result = $this->mysqli->query($sql);
 		$count = $result->fetch_row();
 

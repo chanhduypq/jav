@@ -572,29 +572,56 @@ class javfind{
 	// @showSitesDetails
 	function showSitesDetails($code_id){
 
-		$html = '';
-		$sql = "SELECT DISTINCT(`link`) FROM videos WHERE`code_id` = '{$code_id}' AND `link` <> '' ORDER BY `link` ASC ";
-		$result = $this->mysqli->query($sql);
-		$num=0;
-		while ($row = $result->fetch_assoc()) {
-			$html .= '<a href="'.$row['link'].'" target="_blank" class="list-group-item">'.$row['link'].'</a>';
-		}
+            $sql = "SELECT DISTINCT `link`,`host` FROM videos WHERE`code_id` = '{$code_id}' AND `link` <> '' ORDER BY `link` ASC ";
+            $result = $this->mysqli->query($sql);
+            $num=0;
+            $html='<table style="width: 100%;"><tr><td style="width: 70%;word-break: break-all;">&nbsp;</td><td style="width: 15%;">Database Search</td><td style="width: 15%;">Instant Search</td></tr>';
+            while ($row = $result->fetch_assoc()) {
+                $html.='<tr><td style="width: 70%;word-break: break-all;">'.'<a href="'.$row['link'].'" target="_blank" class="list-group-item">'.$row['link'].'</a></td>';
+                if(trim($row['host'])!=''){
+                    $html.='<td style="width: 15%;">X</td>';
+                }
+                else{
+                    $html.='<td style="width: 15%;">&nbsp;</td>';
+                }
+                if(trim($row['host'])==''){
+                    $html.='<td style="width: 15%;">X</td>';
+                }
+                else{
+                    $html.='<td style="width: 15%;">&nbsp;</td>';
+                }
+                $html.='</tr>';    
+            }
+            $html.='</table>';
 
-		return array('status'=>1,'html'=>$html);
+            return array('status'=>1,'html'=>$html);
 	}
 
 	// @showSourceDetails
 	function showSourceDetails($code_id){
 
-		$html = '';
-		$sql = "SELECT DISTINCT(`source`) FROM videos WHERE`code_id` = '{$code_id}' AND `source` <> '' ORDER BY `source` ASC ";
-		$result = $this->mysqli->query($sql);
-		$num=0;
-		while ($row = $result->fetch_assoc()) {
-			$html .= '<a href="'.$row['source'].'" target="_blank" class="list-group-item">'.$row['source'].'</a>';
-		}
+            $sql = "SELECT DISTINCT `source`,`host` FROM videos WHERE`code_id` = '{$code_id}' AND `source` <> '' ORDER BY `source` ASC ";
+            $result = $this->mysqli->query($sql);
+            $html='<table style="width: 100%;"><tr><td style="width: 70%;word-break: break-all;">&nbsp;</td><td style="width: 15%;">Database Search</td><td style="width: 15%;">Instant Search</td></tr>';
+            while ($row = $result->fetch_assoc()) {
+                $html.='<tr><td style="width: 70%;word-break: break-all;">'.'<a href="'.$row['source'].'" target="_blank" class="list-group-item">'.$row['source'].'</a></td>';
+                if(trim($row['host'])!=''){
+                    $html.='<td style="width: 15%;">X</td>';
+                }
+                else{
+                    $html.='<td style="width: 15%;">&nbsp;</td>';
+                }
+                if(trim($row['host'])==''){
+                    $html.='<td style="width: 15%;">X</td>';
+                }
+                else{
+                    $html.='<td style="width: 15%;">&nbsp;</td>';
+                }
+                $html.='</tr>';    
+            }
+            $html.='</table>';
 
-		return array('status'=>1,'html'=>$html);
+            return array('status'=>1,'html'=>$html);
 
 	}
 
@@ -614,7 +641,7 @@ class javfind{
 	// @getSourceNum
 	function getSourceNum($code_id){
 
-		$sql = "SELECT COUNT(DISTINCT(`source`)) FROM videos WHERE `code_id` = '{$code_id}' ";
+		$sql = "SELECT COUNT(DISTINCT(`source`)) FROM videos WHERE `source`<>'' and `code_id` = '{$code_id}' ";
 		$result = $this->mysqli->query($sql);
 		$count = $result->fetch_row();
 

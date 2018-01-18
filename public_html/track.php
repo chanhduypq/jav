@@ -36,6 +36,14 @@ if(isset($_POST['csv_export']) && $_POST['csv_export']=='ok'){
 		  <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 		  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 		<![endif]-->
+                <style>
+                    .list-group table,.list-group table td{
+                        border: 1px solid black;
+                    }
+                    .list-group table td{
+                        text-align: center;
+                    }
+                </style>
 	</head>
 	<body id="track_page">
 		<div class="loading" id="loading" style="display: none;">Loading&#8230;</div>
@@ -144,7 +152,12 @@ if(isset($_POST['csv_export']) && $_POST['csv_export']=='ok'){
 						<h4 class="modal-title">Site Details</h4>
 					</div>
 					<div class="modal-body">
-						<div class="list-group"></div>
+                                            <div class="list-group">
+<!--                                                <div style="float: left;width: 45%;word-break: break-all;"></div>
+                                                <div style="float: left;width: 10%;">&nbsp;</div>
+                                                <div style="float: left;width: 45%;word-break: break-all;"></div>
+                                                <div style="clear: both;"></div>-->
+                                            </div>
 					</div>
 				</div>
 			</div>
@@ -159,7 +172,12 @@ if(isset($_POST['csv_export']) && $_POST['csv_export']=='ok'){
 						<h4 class="modal-title">Source Details</h4>
 					</div>
 					<div class="modal-body">
-						<div class="list-group"></div>
+                                            <div class="list-group">
+<!--                                                <div style="float: left;width: 45%;word-break: break-all;"></div>
+                                                <div style="float: left;width: 10%;">&nbsp;</div>
+                                                <div style="float: left;width: 45%;word-break: break-all;"></div>
+                                                <div style="clear: both;"></div>-->
+                                            </div>
 					</div>
 				</div>
 			</div>
