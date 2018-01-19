@@ -91,7 +91,7 @@ $(function () {
 	delete_video_notrack();
 	delete_dvd_code();
 	add_dvd_code();
-	cron_update_track_videos();
+//	cron_update_track_videos();
 	show_sites_details();
 	show_source_details();
         if($("#sitem-table .site_detail").length>0||$("#sitem-table .source_detail").length>0){
@@ -273,13 +273,14 @@ $(function () {
 	//delete_dvd_code
 	function delete_dvd_code(){
 		//delete
-		$('.delete').on('click', function (e) {
-			
+                $( "body" ).delegate( ".delete", "click", function() {
+			if($(this).css('cursor')=='not-allowed'){
+                            return;
+                        }
 			var alert = $("#alert");
 			alert.html('');
 			alert.css('visibility', 'hidden');
 
-			e.preventDefault();
 			$.ajax({
 
 				type: 'post',

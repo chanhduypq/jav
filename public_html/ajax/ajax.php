@@ -18,9 +18,27 @@ if(isset($_POST['action'])){
                 } else {
                     $trk = new javfindscraper;
                 }
-//		$trk = new javfind;
-		$status = $trk->startCronTrackcode($number_result,$_POST['database_search'],$_POST['instant_search']);
-		echo json_encode($status);
+
+                if(isset($_POST['dvdCodeId'])){
+                    $dvdCodeId=trim($_POST['dvdCodeId']);
+                }
+                else{
+                    $dvdCodeId=null;
+                }
+                if(isset($_POST['dvdCodeValue'])){
+                    $dvdCodeValue=trim($_POST['dvdCodeValue']);
+                }
+                else{
+                    $dvdCodeValue=null;
+                }
+                $status = $trk->startCronTrackcode($number_result,$_POST['database_search'],$_POST['instant_search'],$dvdCodeId,$dvdCodeValue);
+                if(is_array($status)){
+                    echo json_encode($status);
+                }
+                else{
+                    echo $status;
+                }
+		
 		exit;
 	}
 	//adddvdcode

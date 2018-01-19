@@ -442,9 +442,9 @@ class javfind{
 		return $result;
 	}
         
-        function startCronTrackcode($number_result,$database_search,$instant_search){
+        function startCronTrackcode($number_result, $database_search, $instant_search, $dvdCodeId = null, $dvdCodeValue = null) {
 
-            $createdAt=date('Y-m-d H:i:s');
+        $createdAt=date('Y-m-d H:i:s');
             $sites=array();
             $search_data=array();
             if($instant_search=='1'){
@@ -457,17 +457,14 @@ class javfind{
                 }
             }
             
-		//loop all dvd code
-            $codes = $this->getAllTrackCode();
-            
-            foreach ($codes as $code) {
+	    if(ctype_digit($dvdCodeId)&&is_string($dvdCodeValue)&&trim($dvdCodeValue)!=""){
                 if($database_search=='1'){
-                    $this->findVideos1($code['value'],$number_result, $code['id']);
+                    $this->findVideos1(trim($dvdCodeValue),$number_result, $dvdCodeId);
                 }
                 if($instant_search=='1'){
                     foreach ($sites as $row){
                         $i=1;
-                        $video = get_video($code['value'], $row['url'], $row['search_parameter'], $row['search_result_parameter'], $row['product_parameter'], $row['video_parameter']);
+                        $video = get_video(trim($dvdCodeValue), $row['url'], $row['search_parameter'], $row['search_result_parameter'], $row['product_parameter'], $row['video_parameter']);
                         if ($video !== FALSE) {
                             foreach ($video as $temp) {
                                 if(!is_numeric($number_result)||$i<=$number_result){
@@ -475,8 +472,8 @@ class javfind{
                                     $row['real_title'] = $temp['title'];
                                     $row['real_host'] = $temp['embed'];
                                     $row['status'] = 1;
-                                    $row['code_id'] = $code['id'];
-                                    $row['code_value'] = $code['value'];
+                                    $row['code_id'] = $dvdCodeId;
+                                    $row['code_value'] = trim($dvdCodeValue);
                                     $row['host'] = '';
                                     $row['source'] = '';
                                     $row['domain'] = '';
@@ -491,36 +488,98 @@ class javfind{
                         } 
                     }
                 }
-                    
+                if($instant_search=='1'){
+                    foreach ($search_data as $data) {
+
+                        $sql = "INSERT INTO  `videos`(`code_id`,`code_value`, `title` , `link` , `host` , `source`, `domain`, `language`, `size`, `quality`, `date` , `createdAt`) 
+                                            VALUES ( 
+                                            '". $data['code_id']."',
+                                            '". $data['code_value']."',
+                                            '". $this->mysqli->real_escape_string($data['real_title'])."',
+                                            '". $this->mysqli->real_escape_string($data['real_url'])."',
+                                            '". $this->mysqli->real_escape_string($data['host'])."',
+                                            '". $this->mysqli->real_escape_string($data['source'])."',
+                                            '". $this->mysqli->real_escape_string($data['domain'])."',
+                                            '". $this->mysqli->real_escape_string($data['language'])."',
+                                            '". $this->mysqli->real_escape_string($data['size'])."',
+                                            '". $this->mysqli->real_escape_string($data['quality'])."',
+                                            NULL,
+                                             '". $createdAt."');";
+                            // mysqli_query
+                            $this->mysqli->query($sql);
+
+                    }
+                }
+
+
+                return $this->renCodeHtml($dvdCodeId);
+            }
+            else{
+                $codes = $this->getAllTrackCode();
+            
+                foreach ($codes as $code) {
+                    if($database_search=='1'){
+                        $this->findVideos1($code['value'],$number_result, $code['id']);
+                    }
+                    if($instant_search=='1'){
+                        foreach ($sites as $row){
+                            $i=1;
+                            $video = get_video($code['value'], $row['url'], $row['search_parameter'], $row['search_result_parameter'], $row['product_parameter'], $row['video_parameter']);
+                            if ($video !== FALSE) {
+                                foreach ($video as $temp) {
+                                    if(!is_numeric($number_result)||$i<=$number_result){
+                                        $row['real_url'] = $temp['url'];
+                                        $row['real_title'] = $temp['title'];
+                                        $row['real_host'] = $temp['embed'];
+                                        $row['status'] = 1;
+                                        $row['code_id'] = $code['id'];
+                                        $row['code_value'] = $code['value'];
+                                        $row['host'] = '';
+                                        $row['source'] = '';
+                                        $row['domain'] = '';
+                                        $row['language'] = '';
+                                        $row['size'] = '';
+                                        $row['quality'] = '';
+                                        $row['date']=date('Y-m-d');
+                                        $search_data[] = $row;
+                                        $i++;
+                                    }
+                                }
+                            } 
+                        }
+                    }
+
+                }
+
+                if($instant_search=='1'){
+                    foreach ($search_data as $data) {
+
+                        $sql = "INSERT INTO  `videos`(`code_id`,`code_value`, `title` , `link` , `host` , `source`, `domain`, `language`, `size`, `quality`, `date` , `createdAt`) 
+                                            VALUES ( 
+                                            '". $data['code_id']."',
+                                            '". $data['code_value']."',
+                                            '". $this->mysqli->real_escape_string($data['real_title'])."',
+                                            '". $this->mysqli->real_escape_string($data['real_url'])."',
+                                            '". $this->mysqli->real_escape_string($data['host'])."',
+                                            '". $this->mysqli->real_escape_string($data['source'])."',
+                                            '". $this->mysqli->real_escape_string($data['domain'])."',
+                                            '". $this->mysqli->real_escape_string($data['language'])."',
+                                            '". $this->mysqli->real_escape_string($data['size'])."',
+                                            '". $this->mysqli->real_escape_string($data['quality'])."',
+                                            NULL,
+                                             '". $createdAt."');";
+                            // mysqli_query
+                            $this->mysqli->query($sql);
+
+                    }
+                }
+
+
+                $result = array('status'=>1, 'html'=>$this->renCodeHtml());
+
+                return $result;
             }
             
-            if($instant_search=='1'){
-                foreach ($search_data as $data) {
-
-                    $sql = "INSERT INTO  `videos`(`code_id`,`code_value`, `title` , `link` , `host` , `source`, `domain`, `language`, `size`, `quality`, `date` , `createdAt`) 
-                                        VALUES ( 
-                                        '". $data['code_id']."',
-                                        '". $data['code_value']."',
-                                        '". $this->mysqli->real_escape_string($data['real_title'])."',
-                                        '". $this->mysqli->real_escape_string($data['real_url'])."',
-                                        '". $this->mysqli->real_escape_string($data['host'])."',
-                                        '". $this->mysqli->real_escape_string($data['source'])."',
-                                        '". $this->mysqli->real_escape_string($data['domain'])."',
-                                        '". $this->mysqli->real_escape_string($data['language'])."',
-                                        '". $this->mysqli->real_escape_string($data['size'])."',
-                                        '". $this->mysqli->real_escape_string($data['quality'])."',
-                                        NULL,
-                                         '". $createdAt."');";
-                        // mysqli_query
-                        $this->mysqli->query($sql);
-                    
-                }
-            }
-		
-		
-            $result = array('status'=>1, 'html'=>$this->renCodeHtml());
-
-            return $result;
 	}
         
         function getCurrentTracker(){
@@ -679,10 +738,15 @@ class javfind{
 	}
 
 	// @renCodeHtml
-	function renCodeHtml(){
-
+	function renCodeHtml($codeId=null){
+            if($codeId!==null&& ctype_digit($codeId)){
+                $where='where id='.$codeId;
+            }
+            else{
+                $where='';
+            }
 		$html = '';
-		$sql = "SELECT * FROM codes ORDER BY id ";
+		$sql = "SELECT * FROM codes $where ORDER BY id ";
 		$result = $this->mysqli->query($sql);
 		$num=0;
 		while ($row = $result->fetch_assoc()) {

@@ -97,9 +97,9 @@ if(isset($_POST['csv_export']) && $_POST['csv_export']=='ok'){
 						<div class="col-md-4" style="margin-bottom: 15px;">
 							<button type="button" id="stop" class="btn btn-warning btn-block"><span class="glyphicon glyphicon-stop"></span> Stop</button>
 						</div>
-						<div class="col-md-8">
+<!--						<div class="col-md-8">
 							<div id="progressbar" class="progress-label">Loading...</div>
-						</div>
+						</div>-->
 					</div>
 				</div>
 
@@ -210,9 +210,24 @@ if(isset($_POST['csv_export']) && $_POST['csv_export']=='ok'){
 		<script src="js/run.js?<?php echo substr(md5(mt_rand()), 0, 7);?>"></script>
                 <script type="text/javascript">
                     stopClicked=false;
+                    dvdCodeIds=[];
+                    dvdCodeValues=[];
+                    <?php 
+                    include 'sites/config.php';
+                    $results1 = $mysqli->query("SELECT * FROM codes ORDER BY id ");
+                    while($row = $results1->fetch_array()) { ?>
+                        <?php 
+                        echo 'dvdCodeIds.push("'.$row['id'].'");'; 
+                        echo 'dvdCodeValues.push("'.$row['value'].'");'; 
+                        ?>
+                    <?php 
+                    } 
+                    $mysqli->close();
+                    ?>
                     jQuery(function ($){
                        
                        $("#stop").click(function (){
+                           $("a.delete").removeAttr('disabled').css('cursor','pointer');
                            var alert = $("#alert");
                            stopClicked=true;
                           $('#loaddingbar').hide();
@@ -223,8 +238,83 @@ if(isset($_POST['csv_export']) && $_POST['csv_export']=='ok'){
                           updatecodesresults();                
                        });
                        
+                       $('#cron-start').click(function(e){
+                            stopClicked=false;
+                            if($("#Database_Search").is(":checked")==false&&$("#Instant_Search").is(":checked")==false){
+                                window.alert("Please select at least one type of search");
+                                return;
+                            }
+
+                            if($("#Database_Search").is(":checked")){
+                                database_search='1';
+                            }
+                            else{
+                                database_search='0';
+                            }
+
+                            if($("#Instant_Search").is(":checked")){
+                                instant_search='1';
+                            }
+                            else{
+                                instant_search='0';
+                            }
+
+                            $(this).attr('disabled','disabled').css('cursor','not-allowed');
+                            $("#csv_export button").attr('disabled','disabled').css('cursor','not-allowed');
+
+                                var alert = $("#track_page #alert");
+                                alert.html('');
+                                alert.css('visibility', 'hidden');
+
+                                $('#track_page #loaddingbar').show();
+                                runAjax(database_search,instant_search);
+                        });
+                       
                        
                     });
+                    
+                    function runAjax(database_search,instant_search){
+                        for(i=0;i<dvdCodeIds.length;i++){
+                            dvdCodeId=dvdCodeIds[i];
+                            dvdCodeValue=dvdCodeValues[i];
+                            console.log(dvdCodeValue);
+                            runAjaxForOneSite(dvdCodeId,dvdCodeValue,database_search,instant_search);
+
+                        }
+                    }
+                    
+                    function runAjaxForOneSite(dvdCodeId,dvdCodeValue,database_search,instant_search){
+                        $("a[data-id='"+dvdCodeId+"']").parent().parent().addClass('progress-label');
+                        $("a[data-id='"+dvdCodeId+"']").parent().parent().find('a.delete').attr('disabled','disabled').css('cursor','not-allowed');
+                        $.ajax({
+                                type: 'post',
+                                url: '/ajax/ajax.php',
+                                data: {action: 'startCronTrackCode',dvdCodeId:dvdCodeId,dvdCodeValue:dvdCodeValue ,database_search:database_search,instant_search:instant_search, api_scraper: $('#api_scraper').val(),number_result:$('#number_result').val()},
+                                async: true,
+                                success: function (result) {
+
+                                    console.log(result);
+                                    if(stopClicked==false){
+                                        $("a[data-id='"+dvdCodeId+"']").parent().parent().removeClass('progress-label');
+                                        $("a[data-id='"+dvdCodeId+"']").parent().parent().find('a.delete').removeAttr('disabled').css('cursor','pointer');
+
+                                        
+                                        $("a[data-id='"+dvdCodeId+"']").parent().parent().replaceWith(result);
+
+                                        if($("tr.progress-label").length==0){
+
+                                            $('#track_page #loaddingbar').hide();
+                                            $('#cron-start').removeAttr('disabled').css('cursor','pointer');
+                                            if($("#sitem-table .site_detail").length>0||$("#sitem-table .source_detail").length>0){
+                                                $("#csv_export button").removeAttr('disabled').css('cursor','pointer');
+                                            }
+                                        }
+                                    }
+
+                                }
+                        });
+                        
+                    }
                 </script>
 	</body>
 </html>
