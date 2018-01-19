@@ -45,7 +45,6 @@ class ExampleController extends Controller
 
 //            $url = "https://www.googleapis.com/customsearch/v1?start={$toIndex}&key={$key}&cx={$cx}&q={$searchTermsFiltred}";
             $url = "https://www.googleapis.com/customsearch/v1?start={$offset}&key={$key}&cx={$cx}&q={$searchTermsFiltred}";
-
             $ch = curl_init($url);
             curl_setopt( $ch , CURLOPT_SSL_VERIFYPEER , false );
             curl_setopt( $ch , CURLOPT_RETURNTRANSFER , 1 );
@@ -61,19 +60,99 @@ class ExampleController extends Controller
                   $errorText.= "reason: ".$error->reason;
               }
             
-            $url = "https://api.duckduckgo.com/?q={$searchTermsFiltred}&format=json&pretty=1";
-
-            $ch = curl_init($url);
+//            $url = "https://api.duckduckgo.com/?q={$searchTermsFiltred}&format=json&pretty=1";
+//
+//            $ch = curl_init($url);
+//            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+//            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+//            $result1 = curl_exec($ch);
+//            curl_close($ch);
+//
+//            $result1 = json_decode($result1, true);
+//            if (isset($result1['RelatedTopics']) && count($result1['RelatedTopics']) > 0) {
+//                $result1 = $result1['RelatedTopics'];
+//            } else {
+//                $result1 = null;
+//            }
+            
+            $ch = curl_init("https://duckduckgo.com/html/?q={$searchTermsFiltred}");
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-            $result1 = curl_exec($ch);
-            curl_close($ch);
+            $html = curl_exec($ch);
+              
+            include 'simple_html_dom.php';
+            $html_base = new \simple_html_dom();
+            $html_base->load($html);
+            $nodes = $html_base->find("#links .result");
+            $array=array();
+            foreach ($nodes as $node) {
+                $tmp = $node->find("a");
+                if(isset($tmp[0])){
+                    $url = str_replace('&amp;', '&', $tmp[0]->href);
+                    $temp=explode("https",$url);
+                    if(count($temp)==2){
+                        $url="https".urldecode($temp[1]);
+                    }
+                    else{
+                        $temp=explode("http",$url);
+                        if(count($temp)==2){
+                            $url="http".urldecode($temp[1]);
+                        }
+                        else{
+                            $url="";
+                        }
+                        
+                    }
+                    $title=$tmp[0]->plaintext;
+                    $desc=isset($tmp[1])?$tmp[1]->plaintext:'';
+                    $array[]=array('title'=>$title,'url'=>$url,'desc'=>$desc);
+                }
+            }
+            if(count($array)>0){
+                $result1=$array;
+            }
+            else{
+                $ch = curl_init("https://duckduckgo.com/?q={$searchTermsFiltred}&&ia=web");
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                $html = curl_exec($ch);
 
-            $result1 = json_decode($result1, true);
-            if (isset($result1['RelatedTopics']) && count($result1['RelatedTopics']) > 0) {
-                $result1 = $result1['RelatedTopics'];
-            } else {
-                $result1 = null;
+                $html_base = new \simple_html_dom();
+                $html_base->load($html);
+                $nodes = $html_base->find("#links .result");
+                $array=array();
+                foreach ($nodes as $node) {
+                    $tmp = $node->find("a");
+                    if(isset($tmp[0])){
+                        $url = str_replace('&amp;', '&', $tmp[0]->href);
+                        $temp=explode("https",$url);
+                        if(count($temp)==2){
+                            $url="https".urldecode($temp[1]);
+                        }
+                        else{
+                            $temp=explode("http",$url);
+                            if(count($temp)==2){
+                                $url="http".urldecode($temp[1]);
+                            }
+                            else{
+                                $url="";
+                            }
+
+                        }
+                        $title=$tmp[0]->plaintext;
+                        
+                    }
+                    $tmp = $node->find(".result__snippet");
+                    $desc=isset($tmp[0])?$tmp[0]->plaintext:'';
+                    $array[]=array('title'=>$title,'url'=>$url,'desc'=>$desc);
+                }
+                if(count($array)>0){
+                    $result1=$array;
+                }
+                else{
+                    $result1=null;
+                }
+                
             }
 
             // echo "<pre>";
@@ -91,8 +170,8 @@ class ExampleController extends Controller
                     
                 }
             }
-
             if (!isset($result->items)) {
+                
                 return view('home', [
                     'result' => null,
                     'result1' => $result1,
@@ -101,6 +180,7 @@ class ExampleController extends Controller
                     'page'=>$page,
                     'count'=>$count,
                     'NUMBER_ROW_PERPAGE'=>$NUMBER_ROW_PERPAGE,
+                    
                 ]);
             }
         }
@@ -114,6 +194,7 @@ class ExampleController extends Controller
             'count'=>$count,
             'error' => $errorText,
             'NUMBER_ROW_PERPAGE'=>$NUMBER_ROW_PERPAGE,
+            'html' => $html ?? null,
         ]);
     }
 

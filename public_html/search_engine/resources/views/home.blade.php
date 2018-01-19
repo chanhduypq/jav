@@ -18,6 +18,22 @@
         border-radius: 5px;
         padding: 20px;
     }
+    .list-group h1{
+        display: none;
+    }
+    .list-group.searched h1{
+        text-align: center;
+        display: block;
+    }
+    .list-group-item a{
+        word-break: break-all;
+    }
+/*    .list-group-item h4{
+        margin-bottom: 20px;
+    }
+    .list-group-item p{
+        margin-top: 20px;
+    }*/
 </style>	
 <div class="container">
     <div class="row">
@@ -39,6 +55,7 @@
             <?php 
             if(trim($error)!=''){?>
                 <div class="list-group searched" style="width: 45%;color: red;float: left;margin-right: 10%;">
+                    <h1>Google</h1>
                       <?php 
                       echo $error;
                       ?>
@@ -48,16 +65,18 @@
             else{
                 if (isset($result->items) && count($result->items) > 0){?>
                 <div class="list-group searched" style="width: 45%;float: left;margin-right: 10%;">
+                    <h1>Google</h1>
                   <?php foreach ($result->items as $item){?>
-                    <a href="{{ $item->link }}" class="list-group-item" target="_blank">
+                    <div style="color:#555;" class="list-group-item">
                         <h4 class="list-group-item-heading">{{ $item->title }}</h4>
+                        <a href="{{ $item->link }}" target="_blank">{{ $item->link }}</a>
                         <p class="list-group-item-text">{{ $item->snippet }}</p>
-                    </a>
+                    </div>
                   
                   <?php 
                   }
                   if ($count > 0) {?>
-                      <ul class="pagination pagination-lg">
+<!--                      <ul class="pagination pagination-lg">
                       <?php 
                         $numberPage = ceil($count / $NUMBER_ROW_PERPAGE);
 
@@ -135,7 +154,7 @@
                                     <a href="<?php echo $hrefLast; ?>">Last</a>
                                 </li>
 
-                      </ul>
+                      </ul>-->
                         <?php
                     }
                     ?>
@@ -144,6 +163,7 @@
                 }
                 else{?>
                  <div class="list-group<?php if($search_terms!='') echo ' searched';?>" style="width: 45%;float: left;margin-right: 10%;">
+                     <h1>Google</h1>
                   <?php if ($search_terms!='') echo 'no result';?>  
                 </div>
             
@@ -154,19 +174,26 @@
             
             
                 <div class="list-group<?php if($search_terms!='') echo ' searched';?>" style="width: 45%;float: left;">
+                    <h1>duckduckgo</h1>
                     <?php if (isset($result1) && is_array($result1)&& count($result1) > 0){?>
                   <?php for ($i=0;$i<count($result1);$i++){?>
                       
-                    <a href="<?php echo recursiveFind($result1[$i],'FirstURL');?>" class="list-group-item" target="_blank">
-                        <h4 class="list-group-item-heading"><?php echo recursiveFind($result1[$i],'Text');?></h4>
+<!--                    <a href="<?php // echo recursiveFind($result1[$i],'FirstURL');?>" class="list-group-item" target="_blank">
+                        <h4 class="list-group-item-heading"><?php // echo recursiveFind($result1[$i],'Text');?></h4>
                         <p class="list-group-item-text"></p>
-                    </a>
+                    </a>-->
+                    <div style="color:#555;" class="list-group-item">
+                        <h4 class="list-group-item-heading"><?php echo $result1[$i]['title'];?></h4>
+                        <a href="<?php echo $result1[$i]['url'];?>" target="_blank"><?php echo $result1[$i]['url'];?></a>
+                        <p class="list-group-item-text"><?php echo $result1[$i]['desc'];?></p>
+                    </div>
                     <?php 
             }
             ?>
                   <?php }
                   else{
                       if ($search_terms!=''){
+                          echo $html;
                           echo 'no result';
                       }
                       
@@ -177,7 +204,6 @@
         </form>
     </div>
 </div>
-
 @stop
 <?php 
 function recursiveFind(array $haystack, $needle)

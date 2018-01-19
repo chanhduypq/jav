@@ -1,11 +1,9 @@
 <?php
-
+include_once '../define_db.php';
 $dbhost = 'localhost';
-$dbname = 'admin_prontv';
-//$dbname = 'admin_prontv_test';
-$dbuser = 'root';
-//$dbpasswd = 'JZ5hNjM$@7zh';
-$dbpasswd = '';
+$dbname = DB_NAME;
+$dbuser = DB_USERNAME;
+$dbpasswd = DB_PASSWORD;
 $mysqli = new mysqli($dbhost, $dbuser, $dbpasswd, $dbname);
 $mysqli->query('SET NAMES utf8mb4;');
 

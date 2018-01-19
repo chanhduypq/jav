@@ -4,17 +4,15 @@ set_time_limit(0);
 ini_set ( 'max_execution_time', 1200);
 date_default_timezone_set('Asia/Singapore');
 
-
+include_once 'define_db.php';
 // javfind
 class javfind{
 	
 	/* config db */
 	public $dbhost = 'localhost';
-	public $dbname = 'admin_prontv';
-//        public $dbname = 'admin_prontv_test';
-	public $dbuser = 'root';
-//	public $dbpasswd 	= 'JZ5hNjM$@7zh';
-        public $dbpasswd 	= '';
+	public $dbname = DB_NAME;
+	public $dbuser = DB_USERNAME;
+        public $dbpasswd 	= DB_PASSWORD;
 	public $proxyAuth 	= 'galvin24x7:egor99';
 	public $apikey = 'a56c1dc1143c8a71ae671bd8726cb0cf';// '43cff1c7c5e5c8cc217774b590aeb60c' '149beff6acf922dd37079795cfeee8c1';
 	public $via_proxy 	= true;

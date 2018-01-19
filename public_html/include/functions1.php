@@ -1,16 +1,14 @@
 <?php
 
-
+include_once 'define_db.php';
 // javfind
 class javfindscraper{
 	
 	/* config db */
 	public $dbhost = 'localhost';
-	public $dbname = 'admin_prontv';
-//        public $dbname = 'admin_prontv_test';
-	public $dbuser = 'root';
-//	public $dbpasswd 	= 'JZ5hNjM$@7zh';
-        public $dbpasswd 	= '';
+	public $dbname = DB_NAME;
+	public $dbuser = DB_USERNAME;
+        public $dbpasswd 	= DB_PASSWORD;
 	public $proxyAuth 	= 'galvin24x7:egor99';
 	public $via_proxy 	= false;
 	public $file_check 	= __DIR__.'/lock.txt';
