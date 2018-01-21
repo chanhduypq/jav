@@ -1,5 +1,11 @@
 <?php
-include_once '../define_db.php';
+if(file_exists('../define_db.php')){
+    include_once '../define_db.php';
+}
+else{
+    include_once 'define_db.php';
+}
+
 $dbhost = 'localhost';
 $dbname = DB_NAME;
 $dbuser = DB_USERNAME;
