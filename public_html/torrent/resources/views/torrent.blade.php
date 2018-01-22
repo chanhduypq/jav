@@ -40,6 +40,10 @@
                         @endif
                     @endforeach
                 </div>
+            @elseif ($search_terms!='')
+                <div class="list-group">
+                      no result  
+                </div>
             @endif
 
             @if ($page > 1 || ($torrents > $limit))

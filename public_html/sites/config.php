@@ -88,6 +88,10 @@ function get_video($dvdcode = 'rctd-034', $url, $search_parameter, $search_resul
             if (strpos($first_result_href, $url) === 0) {
                 $detail_url = $url;
             }
+            
+            if (strpos(strtolower($detail_url), strtolower($dvdcode)) === FALSE) {
+                continue;
+            }
 
             $detail_html = curl_get_content($detail_url);
             $detail_html_base = new simple_html_dom();

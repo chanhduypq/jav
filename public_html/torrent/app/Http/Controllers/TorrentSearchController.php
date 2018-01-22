@@ -33,6 +33,7 @@ class TorrentSearchController extends Controller
             $searchTermsFiltred = urlencode(trim($searchTerms));
             $this->page = $request->get('page') ?? $this->page;
 
+            try{
             $axon = new \App\Helpers\Axon\Search();
             $axon->registerProvider(new \App\Helpers\Axon\Search\Provider\YifyProvider());
             $axon->registerProvider(new \App\Helpers\Axon\Search\Provider\KickassProvider());
@@ -45,6 +46,11 @@ class TorrentSearchController extends Controller
 
             $totalTorrents = sizeof($torrents);
             $this->totalPages = ceil($totalTorrents / $this->limit);
+            }
+            catch(\Exception $e){
+                $slice=null;
+                $this->totalPages=0;
+            }
         }
 
         return view('torrent', [
