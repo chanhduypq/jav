@@ -83,17 +83,24 @@
 			<div class="row">
 				<div class="col-lg-12 col-md-12">
 					<div class="table-responsive">
-						<table class="table table-bordered table-striped" id="sitem-table">
+                                            <table class="table table-bordered table-striped" id="sitem-table" style="width: 100%;">
 							<thead>
 								<tr>
-									<th style="width: 20px;">No</th>
+<!--									<th style="width: 20px;">No</th>
 									<th>Title</th>
 									<th>Host</th>
 									<th>Domain</th>
 									<th>Language</th>
 									<th style="width: 100px;">Size</th>
 									<th>Quality</th>
-									<th style="width: 175px">Date</th>
+									<th style="width: 175px">Date</th>-->
+                                                                    <th style="width: 40%;">Title</th>
+                                                                    <th style="width: 10%;">Link</th>
+                                                                    <th style="width: 10%;">Language</th>
+                                                                    <th style="width: 10%;">Size</th>
+                                                                    <th style="width: 10%;">Quality</th>
+                                                                    <th style="width: 10%;">Date</th>
+                                                                    <th style="width: 10%;">&nbsp;</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -156,7 +163,7 @@
                            stopClicked=true;
                           $('#loaddingbar').hide();
                           $('#cron-start').removeAttr('disabled').css('cursor','pointer');
-                          $("input.progress-label").parent().removeClass('progress-label');
+                          $("label.progress-label").removeClass('progress-label');
                           $("input.progress-label").removeAttr('disabled').css('cursor','pointer');
                        });
                        
@@ -178,6 +185,7 @@
 
                             $(this).attr('disabled','disabled').css('cursor','not-allowed');
                             $('#track_page #loaddingbar').show();
+                            $("#sitem-table tbody").html('');
                             
                             if($("#Database_Search").is(":checked")){
                                 runAjaxForDatabaseSearch(dvd_code.val().trim(),$('#api_scraper').val(),$('#number_result').val());
@@ -212,7 +220,7 @@
                                 async: true,
                                 success: function (result) {
 
-                                    console.log(result);
+//                                    console.log(result);
                                     if(stopClicked==false){
                                         $("#Database_Search").parent().removeClass('progress-label');
                                         $("#Database_Search").removeAttr('disabled').css('cursor','pointer');
@@ -220,7 +228,7 @@
                                         
                                         $("#sitem-table tbody").append(result);
 
-                                        if($("input.progress-label").length==0){
+                                        if($("label.progress-label").length==0){
 
                                             $('#track_page #loaddingbar').hide();
                                             $('#cron-start').removeAttr('disabled').css('cursor','pointer');
@@ -241,7 +249,7 @@
                                 async: true,
                                 success: function (result) {
 
-                                    console.log(result);
+//                                    console.log(result);
                                     if(stopClicked==false){
                                         $("#Instant_Search").parent().removeClass('progress-label');
                                         $("#Instant_Search").removeAttr('disabled').css('cursor','pointer');
@@ -249,7 +257,7 @@
                                         
                                         $("#sitem-table tbody").append(result);
 
-                                        if($("input.progress-label").length==0){
+                                        if($("label.progress-label").length==0){
 
                                             $('#track_page #loaddingbar').hide();
                                             $('#cron-start').removeAttr('disabled').css('cursor','pointer');
@@ -278,7 +286,7 @@
                                         
                                         $("#sitem-table tbody").append(result);
 
-                                        if($("input.progress-label").length==0){
+                                        if($("label.progress-label").length==0){
 
                                             $('#track_page #loaddingbar').hide();
                                             $('#cron-start').removeAttr('disabled').css('cursor','pointer');
@@ -307,7 +315,7 @@
                                         
                                         $("#sitem-table tbody").append(result);
 
-                                        if($("input.progress-label").length==0){
+                                        if($("label.progress-label").length==0){
 
                                             $('#track_page #loaddingbar').hide();
                                             $('#cron-start').removeAttr('disabled').css('cursor','pointer');

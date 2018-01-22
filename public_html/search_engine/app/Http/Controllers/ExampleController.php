@@ -20,6 +20,9 @@ class ExampleController extends Controller
 
     public function search(Request $request)
     {
+        @set_time_limit(0);
+        @ini_set('max_execution_time', 0);
+        
         $result = [];
         $params = [];
         $toIndex = 10;

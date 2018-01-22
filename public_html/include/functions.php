@@ -328,7 +328,7 @@ class javfind extends Find{
 
             if (is_string($dvdCodeValue) && trim($dvdCodeValue) != "") {
                 $this->findVideos1(trim($dvdCodeValue), $number_result);
-                return $this->renVideosHtml(trim($dvdCodeValue), $number_result);
+                return $this->renVideosHtmlAtMegaPage(trim($dvdCodeValue), $number_result,'Database Search');
             }
             return '';
         }

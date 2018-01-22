@@ -77,7 +77,7 @@ class javfindscraper extends Find{
 
             if (is_string($dvdCodeValue) && trim($dvdCodeValue) != "") {
                 $this->findVideos1(trim($dvdCodeValue), $number_result);
-                return $this->renVideosHtml(trim($dvdCodeValue), $number_result);
+                return $this->renVideosHtmlAtMegaPage(trim($dvdCodeValue), $number_result,'Database Search');
             }
             return '';
         }
@@ -139,7 +139,7 @@ class javfindscraper extends Find{
             // mysqli_query
             $this->mysqli->query($sql);
         }
-        return $this->renVideosHtml(trim($dvdCodeValue), $number_result);
+        return $this->renVideosHtmlAtMegaPage(trim($dvdCodeValue), $number_result,'Instant Search');
     }
         
         
@@ -575,7 +575,7 @@ class javfindscraper extends Find{
                                             NULL,
                                              '". $createdAt."');";
                             // mysqli_query
-    //                        $this->mysqli->query($sql);
+                            $this->mysqli->query($sql);
 
                     }
                 }
@@ -636,7 +636,7 @@ class javfindscraper extends Find{
                                         NULL,
                                          '". $createdAt."');";
                         // mysqli_query
-//                        $this->mysqli->query($sql);
+                        $this->mysqli->query($sql);
                     
                 }
             }

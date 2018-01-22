@@ -411,6 +411,44 @@ class Find {
 
         return $html;
     }
+    
+    public function renVideosHtmlAtMegaPage($code_value, $limit = 'All',$typeSearchText) {
+        if (ctype_digit($limit)) {
+            $limit = "limit $limit";
+        } else {
+            $limit = "";
+        }
+        $html = '';
+        if($typeSearchText=='Engine Search'||$typeSearchText=='Torrent Search'){
+            $table_name='other_videos';
+            $andWhere=" and type_search='$typeSearchText' ";
+        }
+        else{
+            $table_name='videos';
+            if($typeSearchText=='Instant Search'){
+                $andWhere=" and (source='' or source is null) ";
+            }
+            else{
+                $andWhere=" and source<>'' and source is not null ";
+            }
+        }
+        $sql = "SELECT * FROM $table_name where code_id='0' and code_value like '$code_value' $andWhere ORDER BY createdAt DESC $limit";
+        $result = $this->mysqli->query($sql);
+        
+        while ($row = $result->fetch_assoc()) {
+            $html .= '<tr id="' . $row['id'] . '">';
+            $html .= '<td style="width: 40%;">' . $row['title'] . '</td>';
+            $html .= '<td style="width: 10%;word-break: break-all;"><a href="' . $row['link'] . '" target="_blank">' . $row['link'] . '</a></td>';
+            $html .= '<td style="width: 10%;">' . ($row['language'] ?? '') . '</td>';
+            $html .= '<td style="width: 10%;">' . ($row['size'] ?? '') . '</td>';
+            $html .= '<td style="width: 10%;">' . ($row['quality'] ?? '') . '</td>';
+            $html .= '<td style="width: 10%;">' . ($row['date'] ?? '') . '</td>';
+            $html .= '<td style="width: 10%;">' . $typeSearchText . '</td>';
+            $html .= '</tr>';
+        }
+
+        return $html;
+    }
 
     public function exportAllTocsv() {
 
@@ -489,15 +527,63 @@ class Find {
     }
     
     public function startCronTrackCodeForEngineSearch($number_result, $dvdCodeValue) {
-return '';
-//        $this->findVideos1(trim($dvdCodeValue), $number_result);
-//        return $this->renVideosHtml(trim($dvdCodeValue), $number_result);
+        $url = "http://".$_SERVER['SERVER_NAME']."/search_engine/?search_terms=" . trim($dvdCodeValue);
+        $html = file_get_contents($url);
+        $html_base = new simple_html_dom();
+        $html_base->load($html);
+
+        $nodes = $html_base->find(".list-group-item");
+        $i=1;
+        foreach ($nodes as $node) {
+            if($i>$number_result&&ctype_digit($number_result)){
+                break;
+            }
+            $i++;
+            $tmp=$node->find("h4");
+            $title=$tmp[0]->plaintext;
+            $tmp=$node->find("a");
+            $link=$tmp[0]->plaintext;
+            $sql = "INSERT INTO  `other_videos` (`code_id`,`code_value`, `title` , `link` , `createdAt`,`type_search`) 
+                                            VALUES ( 
+                                            '0',
+                                            '". trim($dvdCodeValue)."',
+                                            '". $this->mysqli->real_escape_string($title)."',
+                                            '". $this->mysqli->real_escape_string($link)."',
+                                             '". $this->createdAt."','Engine Search');";
+            $this->mysqli->query($sql);
+        }
+        return $this->renVideosHtmlAtMegaPage(trim($dvdCodeValue), $number_result, 'Engine Search');
     }
 
     public function startCronTrackCodeForTorrentSearch($number_result, $dvdCodeValue) {
-return '';
-//        $this->findVideos1(trim($dvdCodeValue), $number_result);
-//        return $this->renVideosHtml(trim($dvdCodeValue), $number_result);
+        $url="http://".$_SERVER['SERVER_NAME']."/torrent/?search_terms=".trim($dvdCodeValue);
+        $html = file_get_contents($url);
+        $html_base = new simple_html_dom();
+        $html_base->load($html);
+        
+        $nodes = $html_base->find(".list-group-item");
+        $i=1;
+        foreach ($nodes as $node) {
+            if($i>$number_result&&ctype_digit($number_result)){
+                break;
+            }
+            $i++;
+            $tmp=$node->find("h4");
+            $title=$tmp[0]->plaintext;
+            $tmp=$node->find("a");
+            $link=$tmp[0]->plaintext;
+            $sql = "INSERT INTO  `other_videos` (`code_id`,`code_value`, `title` , `link` , `createdAt`,`type_search`) 
+                                            VALUES ( 
+                                            '0',
+                                            '". trim($dvdCodeValue)."',
+                                            '". $this->mysqli->real_escape_string($title)."',
+                                            '". $this->mysqli->real_escape_string($link)."',
+                                             '". $this->createdAt."','Engine Search');";
+            $this->mysqli->query($sql);
+        }
+        return $this->renVideosHtmlAtMegaPage(trim($dvdCodeValue), $number_result,'Torrent Search');
     }
+    
+    
 
 }
