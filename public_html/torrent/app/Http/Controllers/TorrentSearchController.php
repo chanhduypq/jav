@@ -50,6 +50,7 @@ class TorrentSearchController extends Controller
             catch(\Exception $e){
                 $slice=null;
                 $this->totalPages=0;
+                $errorConnect='Could not connect to "https://yts.am/api/v2/list_movies.json?query_term='.$searchTerms.'"';
             }
         }
 
@@ -60,6 +61,7 @@ class TorrentSearchController extends Controller
             'total_pages' => $this->totalPages >= $this->page ? $this->totalPages : $this->page,
             'search_terms' => $searchTerms,
             'limit' => $this->limit,
+            'error_connect' => $errorConnect ?? null
         ]);
     }
 

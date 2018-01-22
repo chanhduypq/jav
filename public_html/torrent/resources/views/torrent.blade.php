@@ -42,7 +42,14 @@
                 </div>
             @elseif ($search_terms!='')
                 <div class="list-group">
-                      no result  
+                    <?php 
+                    if(is_string($error_connect)&&trim($error_connect)!=""){
+                        echo $error_connect;
+                    }
+                    else{
+                        echo 'no result';
+                    }
+                    ?>
                 </div>
             @endif
 
