@@ -72,6 +72,77 @@ class javfindscraper extends Find{
 		}
 		
 	}
+        
+        function startCronTrackCodeForDatabaseSearch($number_result, $dvdCodeValue) {
+
+            if (is_string($dvdCodeValue) && trim($dvdCodeValue) != "") {
+                $this->findVideos1(trim($dvdCodeValue), $number_result);
+                return $this->renVideosHtml(trim($dvdCodeValue), $number_result);
+            }
+            return '';
+        }
+        
+        function startCronTrackCodeForInstantSearch($number_result, $dvdCodeValue) {
+
+            $createdAt = date('Y-m-d H:i:s');
+        $sites = array();
+        $search_data = array();
+        include_once '../sites/config.php';
+        ;
+        $results = $this->mysqli->query("SELECT * FROM sites");
+        if ($results->num_rows > 0) {
+            while ($row = $results->fetch_array()) {
+                $sites[] = $row;
+            }
+        }
+        foreach ($sites as $row) {
+            $i = 1;
+            $video = get_video(trim($dvdCodeValue), $row['url'], $row['search_parameter'], $row['search_result_parameter'], $row['product_parameter'], $row['video_parameter']);
+            if ($video !== FALSE) {
+                foreach ($video as $temp) {
+                    if (!is_numeric($number_result) || $i <= $number_result) {
+                        $row['real_url'] = $temp['url'];
+                        $row['real_title'] = $temp['title'];
+                        $row['real_host'] = $temp['embed'];
+                        $row['status'] = 1;
+                        $row['code_id'] = '0';
+                        $row['code_value'] = trim($dvdCodeValue);
+                        $row['host'] = '';
+                        $row['source'] = '';
+                        $row['domain'] = '';
+                        $row['language'] = '';
+                        $row['size'] = '';
+                        $row['quality'] = '';
+                        $row['date'] = date('Y-m-d');
+                        $search_data[] = $row;
+                        $i++;
+                    }
+                }
+            }
+        }
+        foreach ($search_data as $data) {
+
+            $sql = "INSERT INTO  `videos`(`code_id`,`code_value`, `title` , `link` , `host` , `source`, `domain`, `language`, `size`, `quality`, `date` , `createdAt`) 
+                                            VALUES ( 
+                                            '" . $data['code_id'] . "',
+                                            '" . $data['code_value'] . "',
+                                            '" . $this->mysqli->real_escape_string($data['real_title']) . "',
+                                            '" . $this->mysqli->real_escape_string($data['real_url']) . "',
+                                            '" . $this->mysqli->real_escape_string($data['host']) . "',
+                                            '" . $this->mysqli->real_escape_string($data['source']) . "',
+                                            '" . $this->mysqli->real_escape_string($data['domain']) . "',
+                                            '" . $this->mysqli->real_escape_string($data['language']) . "',
+                                            '" . $this->mysqli->real_escape_string($data['size']) . "',
+                                            '" . $this->mysqli->real_escape_string($data['quality']) . "',
+                                            NULL,
+                                             '" . $createdAt . "');";
+            // mysqli_query
+            $this->mysqli->query($sql);
+        }
+        return $this->renVideosHtml(trim($dvdCodeValue), $number_result);
+    }
+        
+        
 
 	// @getDetails
 	function getDetails($html,$code_id,$code_value){

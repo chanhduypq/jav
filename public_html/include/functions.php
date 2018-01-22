@@ -324,9 +324,18 @@ class javfind extends Find{
             
 	}
         
+        function startCronTrackCodeForDatabaseSearch($number_result, $dvdCodeValue) {
+
+            if (is_string($dvdCodeValue) && trim($dvdCodeValue) != "") {
+                $this->findVideos1(trim($dvdCodeValue), $number_result);
+                return $this->renVideosHtml(trim($dvdCodeValue), $number_result);
+            }
+            return '';
+        }
+        
         
 
-	// @curl_execute
+    // @curl_execute
 	function curl_execute($url,$time_call=0) {
 
 		$time_call++;

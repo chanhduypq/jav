@@ -41,6 +41,54 @@ if(isset($_POST['action'])){
 		
 		exit;
 	}
+        else if( $_POST['action']=='startCronTrackCodeForDatabaseSearch'  ){
+
+                $api_scraper = $_POST['api_scraper'];
+                $number_result = $_POST['number_result'];
+                if ($api_scraper == 'api') {
+                    $trk = new javfind;
+                } else {
+                    $trk = new javfindscraper;
+                }
+
+                $status = $trk->startCronTrackCodeForDatabaseSearch($number_result,trim($_POST['dvdCodeValue']));
+                echo $status;
+		
+		exit;
+	}
+        else if( $_POST['action']=='startCronTrackCodeForInstantSearch'  ){
+
+                $api_scraper = $_POST['api_scraper'];
+                $number_result = $_POST['number_result'];
+                $trk = new javfindscraper;
+
+                $status = $trk->startCronTrackCodeForInstantSearch($number_result,trim($_POST['dvdCodeValue']));
+                echo $status;
+		
+		exit;
+	}
+        else if( $_POST['action']=='startCronTrackCodeForEngineSearch'  ){
+
+                $api_scraper = $_POST['api_scraper'];
+                $number_result = $_POST['number_result'];
+                $trk = new Find();
+
+                $status = $trk->startCronTrackCodeForEngineSearch($number_result,trim($_POST['dvdCodeValue']));
+                echo $status;
+		
+		exit;
+	}
+        else if( $_POST['action']=='startCronTrackCodeForTorrentSearch'  ){
+
+                $api_scraper = $_POST['api_scraper'];
+                $number_result = $_POST['number_result'];
+                $trk = new Find();
+
+                $status = $trk->startCronTrackCodeForTorrentSearch($number_result,trim($_POST['dvdCodeValue']));
+                echo $status;
+		
+		exit;
+	}
 	//adddvdcode
 	elseif( $_POST['action']=='addDVDcode' && $_POST['code']!='' ){
 

@@ -487,5 +487,17 @@ class Find {
         }
         return array('status' => $status, 'html' => $html);
     }
+    
+    public function startCronTrackCodeForEngineSearch($number_result, $dvdCodeValue) {
+return '';
+//        $this->findVideos1(trim($dvdCodeValue), $number_result);
+//        return $this->renVideosHtml(trim($dvdCodeValue), $number_result);
+    }
+
+    public function startCronTrackCodeForTorrentSearch($number_result, $dvdCodeValue) {
+return '';
+//        $this->findVideos1(trim($dvdCodeValue), $number_result);
+//        return $this->renVideosHtml(trim($dvdCodeValue), $number_result);
+    }
 
 }
