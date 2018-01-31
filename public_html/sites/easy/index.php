@@ -61,8 +61,7 @@ if (!empty($_POST)) {
     }
 }
 
-$results = $mysqli->query("SELECT * FROM sites ORDER BY id desc");
-$num_rows = $results->num_rows; ?>
+?>
 
 <!DOCTYPE html>
 <html lang="en">
