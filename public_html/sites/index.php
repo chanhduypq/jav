@@ -236,6 +236,7 @@ $num_rows = $results->num_rows;
                     <h3 class="add_form edit_form brak"> > </h3>
                     <h3 class="list">PORN SITES LIST</h3>
                     <h3 class="list btn add-btn" onclick="add_site()">ADD NEW</h3>
+                    <h3 class="list btn add-btn" onclick="easy_add()" style="margin-right: 20px;">EASY ADD</h3>
                     <h3 class="add_form">ADD NEW PORN SITE</h3>
                     <h3 class="edit_form">EDIT PORN SITE</h3>
                     <div class="clear10"></div>
@@ -580,6 +581,9 @@ $num_rows = $results->num_rows;
                         $('.add_form').show();
                         $('.test_area').hide();
                         $('#test_video').hide();
+                    }
+                    function easy_add(){
+                        window.location.href = '/sites/easy/index.php';
                     }
                     function home() {
                         window.location.href = 'index.php';
