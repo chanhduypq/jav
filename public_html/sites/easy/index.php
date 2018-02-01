@@ -1,5 +1,6 @@
 <?php 
-include 'config.php';
+include_once 'config.php';
+include_once 'ajax.php';
 
 @set_time_limit(0);
 @ini_set('max_execution_time', 0);
@@ -60,7 +61,8 @@ if (!empty($_POST)) {
         }
     }
 }
-
+//var_dump(easy_add('https://anon-v.com'));
+//exit;
 ?>
 
 <!DOCTYPE html>

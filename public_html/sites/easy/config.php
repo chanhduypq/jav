@@ -176,18 +176,26 @@ function get_parent_class_str($node, $top=2, $current=true) {
 }
 
 function detect_url($url) {
-    $url_parsers = explode('/',$url);
-    if(($url_parsers[0] != 'http:' && $url_parsers[0] != 'https:')
-        || !isset($url_parsers[1]) || $url_parsers[1] != ''
-        || !isset($url_parsers[2]) || $url_parsers[2] == '') {
+    
+    if(strpos($url, "http")!==0){
+        $url="http://$url";
+    }
+    if(!filter_var($url, FILTER_VALIDATE_URL)){
         return 0;
     }
-    $main = $url_parsers[2];
-    $main_parser = explode('.',$main);
-    if(count($main_parser)<2) {
-        return 0;
-    }
-    return $url_parsers[0].'//'.$main_parser[count($main_parser)-2].'.'.$main_parser[count($main_parser)-1];
+    return $url;
+//    $url_parsers = explode('/',$url);
+//    if(($url_parsers[0] != 'http:' && $url_parsers[0] != 'https:')
+//        || !isset($url_parsers[1]) || $url_parsers[1] != ''
+//        || !isset($url_parsers[2]) || $url_parsers[2] == '') {
+//        return 0;
+//    }
+//    $main = $url_parsers[2];
+//    $main_parser = explode('.',$main);
+//    if(count($main_parser)<2) {
+//        return 0;
+//    }
+//    return $url_parsers[0].'//'.$main_parser[count($main_parser)-2].'.'.$main_parser[count($main_parser)-1];
 }
 
 function find_parent($node, $tag) {
@@ -201,7 +209,7 @@ function find_parent($node, $tag) {
     return $parent;
 }
 
-function find_detail_parameter($url) {
+function find_detail_parameter(&$url) {
     $result = array(
         'search_parameter' => '',
         'detail_url' => '',
@@ -209,8 +217,25 @@ function find_detail_parameter($url) {
     );
     $main_url = detect_url($url);
 
+    if (strpos($url, "http") !== 0) {
+        $url = "https://$url";
+    } else {
+        $url = str_replace("http://", "https://", $url);
+    }
     $html = curl_get_content($url);
-
+    if (trim($html) == '') {
+        $url=str_replace("https://", "http://", $url);
+        $html = curl_get_content($url);
+    }
+//    if (trim($html) == '') {
+//        if(strpos($url, "http")!==0){
+//            $url="https://$url";
+//        }
+//        else{
+//            $url=str_replace("http://", "https://", $url);
+//        }
+//        $html = file_get_contents($url);
+//    }
     $html_base = new simple_html_dom();
     $html_base->load($html);
 
@@ -240,6 +265,16 @@ function find_detail_parameter($url) {
                 }
             }
             $result['search_parameter'] = $action . $k . $first_input_text->name . '=[dvdcode]';
+           
+            $temp = $url;
+            $temp = str_replace("https://", "", $temp);
+            $temp = str_replace("http://", "", $temp);
+            $temp = str_replace("www.", "", $temp);
+            $result['search_parameter'] = str_replace("https://", "", $result['search_parameter']);
+            $result['search_parameter'] = str_replace("http://", "", $result['search_parameter']);
+            $result['search_parameter'] = str_replace("//", "", $result['search_parameter']);
+            $result['search_parameter'] = str_replace("www.", "", $result['search_parameter']);
+            $result['search_parameter'] = str_replace($temp, "", $result['search_parameter']);
         }
     }
 
@@ -247,7 +282,12 @@ function find_detail_parameter($url) {
     $data = array();
     $parameters_checked = array();
     $urls_checked = array();
+    $temp = $url;
+    $temp = str_replace("https://", "", $temp);
+    $temp = str_replace("http://", "", $temp);
+    $temp = str_replace("www.", "", $temp);
     foreach ($as as $a) {
+        
         $href = $a->href;
         if(strpos($href, $main_url) === 0) {
             $href = str_replace($main_url, '', $href);
@@ -259,6 +299,11 @@ function find_detail_parameter($url) {
         if(substr($href, -1) == '/') {
             $href = substr($href, 0,-1);
         }
+        $href = str_replace("https://", "", $href);
+        $href = str_replace("http://", "", $href);
+        $href = str_replace("//", "", $href);
+        $href = str_replace("www.", "", $href);
+        $href = str_replace($temp, "", $href);
         $href_parser = explode('/',$href);
         if(count($href_parser) > 2 && strlen($href_parser[2]) > 3) {
             $parameter = $href_parser[1];
@@ -282,7 +327,6 @@ function find_detail_parameter($url) {
             }
         }
     }
-
     $max = 0;
     foreach ($data as $parameter => $num) {
         if($max<$num) {
@@ -302,7 +346,25 @@ function find_detail_parameter($url) {
 function find_search_result($url,$dvdcode) {
     $result = '';
     $main_url = detect_url($url);
+    if (strpos($url, "http") !== 0) {
+        $url = "https://$url";
+    } else {
+        $url = str_replace("http://", "https://", $url);
+    }
     $html = curl_get_content($url);
+    if (trim($html) == '') {
+        $url=str_replace("https://", "http://", $url);
+        $html = curl_get_content($url);
+    }
+//    if (trim($html) == '') {
+//        if(strpos($url, "http")!==0){
+//            $url="https://$url";
+//        }
+//        else{
+//            $url=str_replace("http://", "https://", $url);
+//        }
+//        $html = file_get_contents($url);
+//    }
 
     $html_base = new simple_html_dom();
     $html_base->load($html);
@@ -311,6 +373,12 @@ function find_search_result($url,$dvdcode) {
     $data = array();
     $parameters_checked = array();
     $tag_checked = array();
+    
+    $temp = $url;
+    $temp = str_replace("https://", "", $temp);
+    $temp = str_replace("http://", "", $temp);
+    $temp = str_replace("www.", "", $temp);
+        
     foreach ($as as $a) {
         $href = $a->href;
         if(strpos($href, $main_url) === 0) {
@@ -323,6 +391,12 @@ function find_search_result($url,$dvdcode) {
         if(substr($href, -1) == '/') {
             $href = substr($href, 0,-1);
         }
+        
+        $href = str_replace("https://", "", $href);
+        $href = str_replace("http://", "", $href);
+        $href = str_replace("//", "", $href);
+        $href = str_replace("www.", "", $href);
+        $href = str_replace($temp, "", $href);
         $href_parser = explode('/',$href);
         if(count($href_parser) > 2 && strlen($href_parser[2]) > 3) {
             $parameter = $href_parser[1];
@@ -346,7 +420,6 @@ function find_search_result($url,$dvdcode) {
             }
         }
     }
-
     $max = 0;
     foreach ($data as $parameter => $num) {
         if($max<$num) {
@@ -368,7 +441,26 @@ function find_detail($url) {
     );
     $main_url = detect_url($url);
 
+    if (strpos($url, "http") !== 0) {
+        $url = "https://$url";
+    } else {
+        $url = str_replace("http://", "https://", $url);
+    }
     $html = curl_get_content($url);
+    if (trim($html) == '') {
+        $url=str_replace("https://", "http://", $url);
+        $html = curl_get_content($url);
+    }
+//    if (trim($html) == '') {
+//        if(strpos($url, "http")!==0){
+//            $url="https://$url";
+//        }
+//        else{
+//            $url=str_replace("http://", "https://", $url);
+//        }
+//        $html = file_get_contents($url);
+//    }
+    
 
     $html_base = new simple_html_dom();
     $html_base->load($html);

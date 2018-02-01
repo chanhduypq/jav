@@ -1,5 +1,5 @@
 <?php
-include 'config.php';
+include_once 'config.php';
 
 @set_time_limit(0);
 @ini_set('max_execution_time', 0);
@@ -35,7 +35,7 @@ if(!empty($_POST['action'])) {
     }
 }
 
-if($_GET['action']=='easy_add') {
+if(isset($_GET['action'])&&$_GET['action']=='easy_add') {
     $data = easy_add($_GET['url']);
     exit(json_encode($data));
 }
@@ -52,7 +52,7 @@ function easy_add($input_url) {
         'product_parameter' => '',
     );
 
-    $data['url'] = $url = detect_url($input_url);
+    $url = detect_url($input_url);
     if($url === 0) {
         $data['message'] = 'Site url is wrong';
         exit(json_encode($data));
@@ -66,10 +66,19 @@ function easy_add($input_url) {
             exit(json_encode($data));
         }
     }
+    $data['url'] = $url;
     $data['search_parameter'] = $details['search_parameter'];
     $dvdcode = 'maria';
     $search_url = $url.''.str_replace('[dvdcode]',$dvdcode,$data['search_parameter']);
     $data['search_result_parameter'] = find_search_result($search_url, $dvdcode);
+    
+    if(trim($data['search_result_parameter'])==''){
+        $search_url = $url.''.str_replace('[dvdcode]',$dvdcode,str_replace(".php?q=", "/", $data['search_parameter']));
+        $data['search_result_parameter'] = find_search_result($search_url, $dvdcode);
+        if(trim($data['search_result_parameter'])!=''){
+            $data['search_parameter']= str_replace(".php?q=", "/", $data['search_parameter']);
+        }
+    }
 
     $data['detail_parameter'] = $details['detail_parameter'];
     $detail_url = $url.''.$details['detail_url'];
