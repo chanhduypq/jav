@@ -52,6 +52,10 @@ function easy_add($input_url) {
         'product_parameter' => '',
     );
 
+    if (strpos($input_url, "javlibrary.com") !== FALSE) {
+        $input_url= rtrim($input_url,'/');
+        $input_url.='/en/';
+    }
     $url = detect_url($input_url);
     if($url === 0) {
         $data['message'] = 'Site url is wrong';
@@ -68,17 +72,32 @@ function easy_add($input_url) {
     }
     $data['url'] = $url;
     $data['search_parameter'] = $details['search_parameter'];
-    $dvdcode = 'maria';
-    $search_url = $url.''.str_replace('[dvdcode]',$dvdcode,$data['search_parameter']);
-    $data['search_result_parameter'] = find_search_result($search_url, $dvdcode);
-    
-    if(trim($data['search_result_parameter'])==''){
-        $search_url = $url.''.str_replace('[dvdcode]',$dvdcode,str_replace(".php?q=", "/", $data['search_parameter']));
+    if(trim($data['search_parameter'])==''){
+        $data['search_result_parameter'] = '';
+    }
+    else{
+        if (strpos($input_url, "withjav.com") !== false) {
+            $dvdcode = 'a';
+        }
+        else{
+            $dvdcode = 'maria';
+        }
+        
+        $search_url = $url.''.str_replace('[dvdcode]',$dvdcode,$data['search_parameter']);
         $data['search_result_parameter'] = find_search_result($search_url, $dvdcode);
-        if(trim($data['search_result_parameter'])!=''){
-            $data['search_parameter']= str_replace(".php?q=", "/", $data['search_parameter']);
+
+        if(trim($data['search_result_parameter'])==''){
+            $search_url = $url.''.str_replace('[dvdcode]',$dvdcode,str_replace(".php?q=", "/", $data['search_parameter']));
+            $data['search_result_parameter'] = find_search_result($search_url, $dvdcode);
+            if(trim($data['search_result_parameter'])!=''){
+                $data['search_parameter']= str_replace(".php?q=", "/", $data['search_parameter']);
+            }
+        }
+        if(trim($data['search_result_parameter'])==''){
+            $data['search_result_parameter'] = find_search_result1($url);
         }
     }
+    
 
     $data['detail_parameter'] = $details['detail_parameter'];
     $detail_url = $url.''.$details['detail_url'];

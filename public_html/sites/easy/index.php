@@ -11,7 +11,9 @@ include_once 'ajax.php';
 @ini_set("auto_detect_line_endings", true);
 
 require_once 'simple_html_dom.php';
-
+//$data = easy_add('openload-d.co');
+//    exit(json_encode($data));
+    
 $message = '';
 $page = 'list';
 if (!empty($_POST)) {
@@ -342,22 +344,10 @@ if (!empty($_POST)) {
 
         <script type="text/javascript">
             var stopClicked=false;
-            var addColumn=false;
-            var siteIds=[];
-            var video_hosts=[];
-            var search_parameters=[];
-            var video_parameters=[];
-            var names=[];
-            var urls=[];
-            var detail_parameters=[];
-            var product_parameters=[];
-            var resultAjax='';
             
             $( function() {
                 add_site();
                 
-
-                $( "#tabs" ).tabs();
 
                 $('.list').show();
                 <?php if($page == 'add_form') { echo 'add_site();'; } ?>
