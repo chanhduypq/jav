@@ -93,7 +93,7 @@ function easy_add($input_url) {
                 $data['search_parameter']= str_replace(".php?q=", "/", $data['search_parameter']);
             }
         }
-        if(trim($data['search_result_parameter'])==''){
+        if( strpos($url, "javlibrary.com") !== false||trim($data['search_result_parameter'])==''||(isset($data['ignore_form'])&&$data['ignore_form']==true)){
             $data['search_result_parameter'] = find_search_result1($url);
         }
     }

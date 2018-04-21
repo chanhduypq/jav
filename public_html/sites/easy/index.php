@@ -11,7 +11,7 @@ include_once 'ajax.php';
 @ini_set("auto_detect_line_endings", true);
 
 require_once 'simple_html_dom.php';
-//$data = easy_add('openload-d.co');
+//$data = easy_add('myjavlibrary.net');
 //    exit(json_encode($data));
     
 $message = '';
@@ -238,6 +238,15 @@ if (!empty($_POST)) {
                 top: calc(50% - 100px);
                 left: calc(50% - 135px);
             }
+            
+            input.readonly{
+                cursor: not-allowed;
+                background-color:#dddddd;
+                display: none;
+            }
+            label.readonly{
+                display: none;
+            }
         </style>
 	</head>
 	<body id="track_page">
@@ -272,30 +281,30 @@ if (!empty($_POST)) {
             <div class="content add_form edit_form">
                 <form method="post">
                     <input type="hidden" id="id" name="id" <?php if(!empty($_POST['id'])) { echo 'value="'.$_POST['id'].'"'; }?>>
-                    <label>Site name</label>
-                    <input type="text" id="name" name="name" placeholder="Site Name" <?php if(!empty($_POST['name'])) { echo 'value="'.$_POST['name'].'"'; }?> required>
-                    <label>Site url</label>
-                    <input type="text" id="url" name="url" placeholder="Site Url" <?php if(!empty($_POST['url'])) { echo 'value="'.$_POST['url'].'"'; }?> required>
+                    <label class="readonly">Site name</label>
+                    <input class="readonly" readonly="readonly" type="text" id="name" name="name" placeholder="Site Name" <?php if(!empty($_POST['name'])) { echo 'value="'.$_POST['name'].'"'; }?> required>
+                    <label>Url</label>
+                    <input type="text" id="url" name="url" placeholder="Please enter url" <?php if(!empty($_POST['url'])) { echo 'value="'.$_POST['url'].'"'; }?> required>
                     <label></label>
                     <input onclick="easy_add()" type="button" class="btn" value="Easy Add" style="padding: 10px;">
                     <div style="clear:both;height:0"></div>
-                    <label>Search parameter</label>
-                    <input type="text" id="search_parameter" name="search_parameter" placeholder="Search parameter" <?php if(!empty($_POST['search_parameter'])) { echo 'value="'.$_POST['search_parameter'].'"'; }?> required>
-                    <label>Search result parameter</label>
-                    <input type="text" id="search_result_parameter" name="search_result_parameter" placeholder="Search result parameter" <?php if(!empty($_POST['search_result_parameter'])) { echo 'value="'.$_POST['search_result_parameter'].'"'; }?> required>
-                    <label>Detail page parameter</label>
-                    <input type="text" id="detail_parameter" name="detail_parameter" placeholder="Detail page parameter" <?php if(!empty($_POST['detail_parameter'])) { echo 'value="'.$_POST['detail_parameter'].'"'; }?> required>
-                    <label>Video parameter</label>
-                    <input type="text" id="video_parameter" name="video_parameter" placeholder="Video parameter" <?php if(!empty($_POST['video_parameter'])) { echo 'value="'.$_POST['video_parameter'].'"'; }?> required>
+                    <label class="readonly">Search parameter</label>
+                    <input class="readonly" readonly="readonly" type="text" id="search_parameter" name="search_parameter" placeholder="Search parameter" <?php if(!empty($_POST['search_parameter'])) { echo 'value="'.$_POST['search_parameter'].'"'; }?> required>
+                    <label class="readonly">Search result parameter</label>
+                    <input class="readonly" readonly="readonly" type="text" id="search_result_parameter" name="search_result_parameter" placeholder="Search result parameter" <?php if(!empty($_POST['search_result_parameter'])) { echo 'value="'.$_POST['search_result_parameter'].'"'; }?> required>
+                    <label class="readonly">Detail page parameter</label>
+                    <input class="readonly" readonly="readonly" type="text" id="detail_parameter" name="detail_parameter" placeholder="Detail page parameter" <?php if(!empty($_POST['detail_parameter'])) { echo 'value="'.$_POST['detail_parameter'].'"'; }?> required>
+                    <label class="readonly">Video parameter</label>
+                    <input class="readonly" readonly="readonly" type="text" id="video_parameter" name="video_parameter" placeholder="Video parameter" <?php if(!empty($_POST['video_parameter'])) { echo 'value="'.$_POST['video_parameter'].'"'; }?> required>
                     <div class="clear10"></div>
-                    <input style="margin-left: 175px" type="radio" id="video_host_openload" name="video_host" value="openload" <?php if(empty($_POST['video_host']) || $_POST['video_host'] == 'openload') { echo 'checked'; }?>> Openload
+                    <input disabled="disabled" class="readonly" readonly="readonly" style="margin-left: 175px" type="radio" id="video_host_openload" name="video_host1" value="openload"><label class="readonly" style="margin-left: 10px;">Openload</label>
                     <div class="clear10"></div>
-                    <input style="margin-left: 175px" type="radio" id="video_host_google_drive" name="video_host" value="google drive" <?php if(!empty($_POST['video_host']) || $_POST['video_host'] == 'google drive') { echo 'checked'; }?>> Google Drive
+                    <input disabled="disabled" class="readonly" style="margin-left: 175px" type="radio" id="video_host_google_drive" name="video_host1" value="google drive"><label class="readonly" style="margin-left: 10px;">Google Drive</label>
                     <div class="clear10"></div>
-                    <label>Product name parameter</label>
-                    <input type="text" id="product_parameter" name="product_parameter" placeholder="Product name parameter" <?php if(!empty($_POST['product_parameter'])) { echo 'value="'.$_POST['product_parameter'].'"'; }?> required>
+                    <label class="readonly">Product name parameter</label>
+                    <input class="readonly" readonly="readonly" type="text" id="product_parameter" name="product_parameter" placeholder="Product name parameter" <?php if(!empty($_POST['product_parameter'])) { echo 'value="'.$_POST['product_parameter'].'"'; }?> required>
 
-                    <input style="float:left;height:43px;width: 300px;margin-right: 20px;margin-left: 175px" type="text" id="test_dvdcode" placeholder="dvd code" value="rctd-034"><input class="btn" style="width: auto;height:43px" onclick="test()" type="button" value="Test">
+                    <input style="float:left;height:43px;width: 300px;margin-right: 20px;margin-left: 175px;display: none;" type="text" id="test_dvdcode" placeholder="dvd code" value="rctd-034"><input class="btn" style="width: auto;height:43px;display: none;" onclick="test()" type="button" value="Test">
                     <div class="clear10 test_area"></div>
                     <table class="test_area" id="test_sites" style="display:none">
                         <tr>
@@ -313,8 +322,9 @@ if (!empty($_POST)) {
                     </table>
                     <iframe style="width:450px;height:250px;margin-left:175px;display:none" class="test_area" id="test_video" src="" frameborder="0" class="embed-player" scrolling="no" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" rel="nofollow"></iframe>
                     <div class="clear10"></div>
-                    <input style="height:43px;width: auto;margin-left: 175px;margin-right: 20px;padding:0 20px;" type="submit" value="Save">
+                    <input id="button_save" style="height:43px;width: auto;margin-left: 175px;margin-right: 20px;padding:0 20px;display: none;" type="submit" value="Save">
                     <input onclick="delete_btn()" class="edit_form btn" style="padding:0 20px;height:43px;width: auto;margin-left: 0;background: firebrick" type="button" value="Delete">
+                    <input type="hidden" name="video_host"/>
                 </form>
             </div>
             <form style="display:none" method="post">
@@ -357,11 +367,12 @@ if (!empty($_POST)) {
 
             function easy_add() {
                 var url = $.trim($('#url').val());
-                $('.my_loading').show();
+                
                 if(url == '') {
-                    alert('Please input site url');
+                    alert('Please enter url');
                     return false;
                 }
+                $('.my_loading').show();
                 $.ajax({
                     type: 'post',
                     url: 'ajax.php',
@@ -371,7 +382,13 @@ if (!empty($_POST)) {
                     },
                     dataType: 'json',
                     success: function (result) {
+                        $('.readonly').show();
                         $('.my_loading').hide();
+                        url=result.url;
+                        url=url.replace('https://','');
+                        url=url.replace('http://','');
+                        temp=url.split('.');
+                        $('#name').val(temp[0]);
                         $('#url').val(result.url);
                         $('#search_parameter').val(result.search_parameter);
                         $('#search_result_parameter').val(result.search_result_parameter);
@@ -379,6 +396,8 @@ if (!empty($_POST)) {
                         $('#video_parameter').val(result.video_parameter);
                         $('#product_parameter').val(result.product_parameter);
                         $('#video_host_'+result.video_host).prop('checked',true);
+                        $('#button_save').show();
+                        $('input[name="video_host"]').val(result.video_host);
                         if(result.message != '') {
                             alert(result.message);
                         }

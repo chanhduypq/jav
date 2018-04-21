@@ -13,9 +13,6 @@ $dbpasswd = DB_PASSWORD;
 $mysqli = new mysqli($dbhost, $dbuser, $dbpasswd, $dbname);
 $mysqli->query('SET NAMES utf8mb4;');
 
-//$html= curl_get_content('https://18streams.net/');
-//echo $html;
-
 function curl_get_content($url, $ssl = false, $count = 1, $via_proxy = true) {
     $headers = array();
     $headers[] = "Accept-Encoding: gzip, deflate";
@@ -184,55 +181,46 @@ function detect_url($url) {
         $url="http://$url";
     }
     if(!filter_var($url, FILTER_VALIDATE_URL)){
-        return 0;
+        return '0';
     }
     return $url;
-//    $url_parsers = explode('/',$url);
-//    if(($url_parsers[0] != 'http:' && $url_parsers[0] != 'https:')
-//        || !isset($url_parsers[1]) || $url_parsers[1] != ''
-//        || !isset($url_parsers[2]) || $url_parsers[2] == '') {
-//        return 0;
-//    }
-//    $main = $url_parsers[2];
-//    $main_parser = explode('.',$main);
-//    if(count($main_parser)<2) {
-//        return 0;
-//    }
-//    return $url_parsers[0].'//'.$main_parser[count($main_parser)-2].'.'.$main_parser[count($main_parser)-1];
 }
 
 function find_parent($node, $tag) {
     $parent = $node->parent;
-    if($parent->tag == 'html') {
+    if ($parent->tag == 'html') {
         return 0;
     }
     if ($parent->tag != $tag) {
-        $temp=$parent->parent;
-        
-        if($temp->tag!=$tag){
-            $temp=$temp->parent;
+        $temp = $parent->parent;
+        if ($temp->tag == 'html') {
+            return 0;
         }
-        else{
+        if ($temp->tag != $tag) {
+            $temp = $temp->parent;
+        } else {
+            return $temp;
+        }
+        if ($temp->tag == 'html') {
+            return 0;
+        }
+
+        if ($temp->tag != $tag) {
+            $temp = $temp->parent;
+        } else {
+            return $temp;
+        }
+        if ($temp->tag == 'html') {
+            return 0;
+        }
+
+        if ($temp->tag != $tag) {
+            $temp = $temp->parent;
+        } else {
             return $temp;
         }
 
-        if($temp->tag!=$tag){
-            $temp=$temp->parent;
-        }
-        else{
-            return $temp;
-        }
-        
-        if($temp->tag!=$tag){
-            $temp=$temp->parent;
-        }
-        else{
-            return $temp;
-        }
-        
         return 0;
-        
-//        return find_parent($parent, $tag);
     }
     return $parent;
 }
@@ -245,11 +233,6 @@ function find_detail_parameter(&$url) {
     );
     $main_url = detect_url($url);
 
-//    if (strpos($url, "http") !== 0) {
-//        $url = "https://$url";
-//    } else {
-//        $url = str_replace("http://", "https://", $url);
-//    }
     if (strpos($url, "http") !== 0) {
         $url = "http://$url";
     } else {
@@ -257,18 +240,9 @@ function find_detail_parameter(&$url) {
     }
     $html = curl_get_content($url);
     if (trim($html) == '') {
-        $url=str_replace("https://", "http://", $url);
-        $html = curl_get_content($url);
+        return 0;
     }
-//    if (trim($html) == '') {
-//        if(strpos($url, "http")!==0){
-//            $url="https://$url";
-//        }
-//        else{
-//            $url=str_replace("http://", "https://", $url);
-//        }
-//        $html = file_get_contents($url);
-//    }
+
     $html_base = new simple_html_dom();
     $html_base->load($html);
 
@@ -319,26 +293,20 @@ function find_detail_parameter(&$url) {
             $result['search_parameter'] = str_replace($temp, "", $result['search_parameter']);
             
             if ($form !== 0 && !empty($form->getAttribute('data-url'))) {
-                $result['search_parameter']=rtrim($form->getAttribute('data-url'),'/');
-                $result['search_parameter']= str_replace("https://", "", $result['search_parameter']);
-                $result['search_parameter']= str_replace("http://", "", $result['search_parameter']);
-                $result['search_parameter']= str_replace("//", "", $result['search_parameter']);
-                $result['search_parameter']= str_replace("www.", "", $result['search_parameter']);
-                $temp1=explode("/",$result['search_parameter']);
-                $result['search_parameter']='';
-                for($i=0,$n=count($temp1);$i<$n-1;$i++){
-                    $result['search_parameter'].=$temp1[$i]."/";
-                }
-                $result['search_parameter'].='[dvdcode]'.'/';
-                
+                $result['search_parameter'] = rtrim($form->getAttribute('data-url'), '/');
                 $result['search_parameter'] = str_replace("https://", "", $result['search_parameter']);
                 $result['search_parameter'] = str_replace("http://", "", $result['search_parameter']);
                 $result['search_parameter'] = str_replace("//", "", $result['search_parameter']);
                 $result['search_parameter'] = str_replace("www.", "", $result['search_parameter']);
+                $temp1 = explode("/", $result['search_parameter']);
+                $result['search_parameter'] = '';
+                for ($i = 0, $n = count($temp1); $i < $n - 1; $i++) {
+                    $result['search_parameter'] .= $temp1[$i] . "/";
+                }
+                $result['search_parameter'] .= '[dvdcode]' . '/';
+
                 $result['search_parameter'] = str_replace($temp, "", $result['search_parameter']);
             }
-            
-            
         }
     }
 
@@ -369,9 +337,9 @@ function find_detail_parameter(&$url) {
         $href = str_replace("www.", "", $href);
         $href = str_replace($temp, "", $href);
         $href_parser = explode('/',$href);
-        if(count($href_parser) > 2 && strlen($href_parser[2]) > 3) {
+        if(count($href_parser) > 1) {
             $parameter = $href_parser[1];
-            if($href_parser[2] == 'watch') {
+            if (count($href_parser) > 2 && $href_parser[2] == 'watch') {
                 $parameter .= '/watch';
             }
             if(strpos($main_url, 'xvideos.com') !== false) {
@@ -402,6 +370,10 @@ function find_detail_parameter(&$url) {
             $result['detail_url'] = $urls_checked[$parameter];
         }
     }
+    
+    if ($html_base->find('input[type="url"]', 0) || (isset($form) && $form->getAttribute('method') === 'post')) {
+        $result['ignore_form']=true;
+    }
     $html_base->clear();
     unset($html_base);
     return $result;
@@ -410,11 +382,7 @@ function find_detail_parameter(&$url) {
 function find_search_result($url,$dvdcode) {
     $result = '';
     $main_url = detect_url($url);
-//    if (strpos($url, "http") !== 0) {
-//        $url = "https://$url";
-//    } else {
-//        $url = str_replace("http://", "https://", $url);
-//    }
+
     if (strpos($url, "http") !== 0) {
         $url = "http://$url";
     } else {
@@ -422,24 +390,17 @@ function find_search_result($url,$dvdcode) {
     }
 
     $html = curl_get_content($url);
-    if (trim($html) == '') {
-        $url=str_replace("https://", "http://", $url);
-        $html = curl_get_content($url);
-    }
-//    if (trim($html) == '') {
-//        if(strpos($url, "http")!==0){
-//            $url="https://$url";
-//        }
-//        else{
-//            $url=str_replace("http://", "https://", $url);
-//        }
-//        $html = file_get_contents($url);
-//    }
 
     $html_base = new simple_html_dom();
     $html_base->load($html);
 
-    $as = $html_base->find('a');
+    if (strpos($url, "myjavlibrary.net") === false) {
+        $as = $html_base->find('a');
+    }
+    else{
+        $as = $html_base->find('.entry-title a');
+    }
+    
     $data = array();
     $parameters_checked = array();
     $tag_checked = array();
@@ -450,7 +411,7 @@ function find_search_result($url,$dvdcode) {
     $temp = str_replace("www.", "", $temp);
     foreach ($as as $a) {
         $href = $a->href;
-        if(!is_array($a->find('img'))||count($a->find('img'))==0&& strpos($href, "url")===FALSE){
+        if ((!is_array($a->find('img')) || count($a->find('img')) == 0) && strpos($href, "url") === FALSE) {
             continue;
         }
         if(strpos($href, $main_url) === 0) {
@@ -512,9 +473,9 @@ function find_search_result($url,$dvdcode) {
             $href = str_replace("www.", "", $href);
             $href = str_replace($temp, "", $href);
             $href_parser = explode('/',$href);
-            if(count($href_parser) > 2 && strlen($href_parser[2]) > 3) {
+            if(count($href_parser) > 1) {
                 $parameter = $href_parser[1];
-                if($href_parser[2] == 'watch') {
+                if (count($href_parser) > 2 && $href_parser[2] == 'watch') {
                     $parameter .= '/watch';
                 }
                 if(strpos($main_url, 'xvideos.com') !== false) {
@@ -557,10 +518,6 @@ function find_search_result1($url) {
     }
 
     $html = curl_get_content($url);
-    if (trim($html) == '') {
-        $url=str_replace("https://", "http://", $url);
-        $html = curl_get_content($url);
-    }
 
     $html_base = new simple_html_dom();
     $html_base->load($html);
@@ -580,11 +537,12 @@ function find_search_result1($url) {
         if(!is_array($a->find('img'))||count($a->find('img'))==0){
             continue;
         }
+        
         if(strpos($href, $url) === 0) {
             $href = str_replace($url, '', $href);
         }
         $href_parser = explode('?',$href);
-        if(count($href_parser) > 1) {
+        if (count($href_parser) > 1 && strpos($url, "javlibrary.com") === false) {
             $href = $href_parser[0];
         }
         if(substr($href, -1) == '/') {
@@ -597,9 +555,10 @@ function find_search_result1($url) {
         $href = str_replace("www.", "", $href);
         $href = str_replace($temp, "", $href);
         $href_parser = explode('/',$href);
-        if(count($href_parser) > 2 && strlen($href_parser[2]) > 3) {
+        
+        if(count($href_parser) > 1) {
             $parameter = $href_parser[1];
-            if($href_parser[2] == 'watch') {
+            if (count($href_parser) > 2 && $href_parser[2] == 'watch') {
                 $parameter .= '/watch';
             }
             if(strpos($url, 'xvideos.com') !== false) {
@@ -624,7 +583,6 @@ function find_search_result1($url) {
             $result = $tag_checked[$parameter];
         }
     }
-    
     $html_base->clear();
     unset($html_base);
     return $result;
@@ -638,11 +596,6 @@ function find_detail($url) {
     );
     $main_url = detect_url($url);
 
-//    if (strpos($url, "http") !== 0) {
-//        $url = "https://$url";
-//    } else {
-//        $url = str_replace("http://", "https://", $url);
-//    }
     if (strpos($url, "http") !== 0) {
         $url = "http://$url";
     } else {
@@ -653,16 +606,6 @@ function find_detail($url) {
         $url=str_replace("https://", "http://", $url);
         $html = curl_get_content($url);
     }
-//    if (trim($html) == '') {
-//        if(strpos($url, "http")!==0){
-//            $url="https://$url";
-//        }
-//        else{
-//            $url=str_replace("http://", "https://", $url);
-//        }
-//        $html = file_get_contents($url);
-//    }
-    
 
     $html_base = new simple_html_dom();
     $html_base->load($html);
